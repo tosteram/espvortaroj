@@ -1,8 +1,8 @@
 /*
 File	init.js
-Date	2014-06-28, 07-16; v2.0 08-01
+Date	2014-06-28, 07-16; v2.0 08-01; v2.1 2016-03-06
 
-Copyright (C) 2014, Tositaka TERAMOTO & FUKUMOTO Hirotsugu.
+Copyright (C) 2014-2016, Tositaka TERAMOTO & FUKUMOTO Hirotsugu.
 Permission to use, copy, modify, and distribute this software and 
 its documentation for any purpose (including commercial) is hereby granted 
 without fee, provided that the above copyright notice appear in all 
@@ -11,7 +11,7 @@ notice appear in supporting documentation.
 This file is provided "as is" without express or implied warranty.
 */
 
-var version="v2.0 (2014-08-01)";
+var version="v2.1 (2016-03-06)";
 var available_langs= ["eo","en","ja"];
 var lang_file= null;
 
@@ -35,21 +35,29 @@ var dictionaries= {
 		},
 	bestplant: {
 		name:"日エス対照動植物名リスト", edition:"野村忠綱編 1988-1994",
-		dict_js:"bestplant.js", text:"plain",
+		dict_js:"bestplant.js", text:"html",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
-	espdic: {
-		name:"Esperanto-English (Denisowski)", edition:"Paul Denisowski, 19 Dec. 2013",
-		dict_js:"espdic.js", text:"plain",
+	kabe: {
+		name:"Vortaro de Esperanto (Kabe)", edition:"Kazimierz Bein, 1910",
+		dict_js:"kabe.js", text:"html",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
-/*
 	butler: {
 		name:"Esperanto-English (Butler)", edition:"Montagu C. Butler, 1967",
 		dict_js:"butler.js", text:"html",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
-*/
+	espdic: {
+		name:"Esperanto-English (Denisowski)", edition:"Paul Denisowski, 2 Aug. 2015",
+		dict_js:"espdic.js", text:"plain",
+		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
+		},
+	komputeko: {
+		name:"Komputeko, English-Esperanto", edition:"Komputeko, Majo 2015",
+		dict_js:"komputeko.js", text:"html",
+		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
+		},
 	engesp1906: {
 		name:"English-Esperanto (1906)", edition:"O'Connor and Hayes, 1906",
 		dict_js:"engesp1906.js", text:"plain",

@@ -11,6 +11,7 @@
 	td {border:solid 1px grey; padding-left:2px; padding-right:3px; min-width:10px;}
 	.small {font-size:smaller;}
 	.faint {font-size:smaller; color:darkgrey;}
+	.indent1 {padding-left:1.2em; text-indent:-1.2em;}
 </style>
 </head>
 
@@ -29,8 +30,8 @@
 	&nbsp; 外来語音: てぃ→thi、でぃ→dhi、とぅ→thu、どぅ→dhu<br>
 	&nbsp; 小文字は l (エル)を付けます: la→ぁ、lya→ゃ、など<br>
 	&nbsp; 「ん」の後のあ行、や行音は、その間に区切り文字(' - 空白)をいれます:<br>
-	&nbsp; 例: kon'yaku, kon-yaku, kon yaku → 「こんやく」、konnyaku は 「こんにゃく」;<br>
-	&nbsp; &nbsp; zen'in, zen-in, zen in → 「ぜんいん」、zenin は 「ぜにん」<br>
+	&nbsp; 例: zen'in, zen-in, zen in → 「ぜんいん」、zenin は「ぜにん」、
+	zennin は「ぜんにん」<br>
 	<br>
 	<b>エス和(など)</b>のときは、
 	<u>アルファベット</u> で入力してください。<br>
@@ -45,13 +46,20 @@
 	※「全文」は、見出し語[漢字とひらがな]及び訳語、用例を含みます</li>
 </ul>
 
-☆ 検索で見つかった見出し語が、左欄に表示されます。
+<div class="indent1">☆ 検索で見つかった見出し語が、左欄に表示されます。
 また、右欄パネルには、それぞれの見出しの内容(訳語、用例など)が表示されます。<br>
-☆ <span class="small">[小ワザ]</span> 左右パネルの境界線(サッシ)にマウスポインターを置くと、形が ⇔ となり、
-左ボタンを押しながらドラッグすると、幅を変えることができます。<br>
-☆ <span class="small">[小ワザ]</span> 右パネルに太字で表示されている"見出し語"をクリックすると、
-辞書名が約１秒間表示されます。<br>
+[注意] 和エス辞書の場合、日本語見出しはひらがなのUnicode順に並びます。
+例:「あけ」で検索すると、「あけ、あけがた、あけくれ…」、
+「あげ」で検索すると、「あげ、あげあし、あげく…」が表示されます。</div>
+<div class="indent1">☆ <span class="small">[小ワザ]</span> 左右パネルの境界線(サッシ)にマウスポインターを置くと、形が ⇔ となり、
+左ボタンを押しながらドラッグすると、幅を変えることができます。</div>
+<div class="indent1">☆ <span class="small">[小ワザ]</span> 右パネルに太字で表示されている"見出し語"をクリックすると、
+辞書名が約１秒間表示されます。</div>
+<div class="indent1">☆ <span class="small">[小ワザ]</span>
+ESCキーを押すと、入力された検索文字列が消去されます。
+</div>
 <br>
+
 <b>複数辞書検索</b> : &nbsp;
 辞書を複数個選択していると、同時に複数辞書を検索します。
 検索範囲が「見出し語」の場合は、一致した全見出しがソート(<a href="#other_opts">*</a>)されます。
@@ -60,13 +68,14 @@
 <span class="faint">(例えばエス和と和エスの辞書を同時に見出し語検索するというのは、
 余り意味を成しませんが、辞書を切換えずに両辞書を利用できるという利点があります…)</span><br>
 <br>
+
 「<b>全消去</b>」ボタンをクリックすると、内容がクリアされます。<br>
-☆ 左欄の見出し語をクリックすると、その内容が右パネルに表示されます。<br>
+<div class="indent1">☆ 左欄の見出し語をクリックすると、その内容が右パネルに表示されます。</div>
 <br>
 <b>検索履歴</b> : &nbsp;
 ボタン(<img src="sistem_img/Down.gif">)をクリック、または[↓]キーを押すと、
 今までの入力履歴が表示されます。マウスで選択クリック、または矢印キー[↑] [↓]で
-選択して[Enter]キーを押すと、テキストボックスに入力されます。
+選択して[Enter]キーを押すと、検索を開始します。
 何もせず消すときは、履歴ボックス以外の所をクリックするか、[Esc]キーを押してください。<br>
 <br>
 
@@ -75,23 +84,23 @@
 辞書選択ダイアログが表示されます。検索対象の辞書を選択して、
 [OK]ボタンをクリックしてください。<br>
 <br>
-☆ 複数個の辞書を選択できます。<br>
-☆ 辞書を選択すると、<img src="sistem_img/Book.gif">が表示され、
-[OK]ボタンをクリックすると、メモリーに読み込まれ(ロードされ)ます。<br>
-☆ 既に読み込まれている辞書には<img src="sistem_img/Book.gif">が表示されます。<br>
-☆ <img src="sistem_img/Book.gif">をクリックすると、(検索対象として選択されていない時)
+<div class="indent1">☆ 複数個の辞書を選択できます。</div>
+<div class="indent1">☆ 辞書を選択すると、<img src="sistem_img/Book.gif">が表示され、
+[OK]ボタンをクリックすると、メモリーに読み込まれ(ロードされ)ます。</div>
+<div class="indent1">☆ 既に読み込まれている辞書には<img src="sistem_img/Book.gif">が表示されます。</div>
+<div class="indent1">☆ <img src="sistem_img/Book.gif">をクリックすると、(検索対象として選択されていない時)
 <img src="sistem_img/Unladen.gif">となり、[OK]ボタンクリック後、
 辞書データが解放されます。
 ただし、メモリー管理は通常ブラウザーが行っているので、
-完全にブラウザーからOS(オペレーティング・システム)側に解放されるとは限りません。<br>
+完全にブラウザーからOS(オペレーティング・システム)側に解放されるとは限りません。</div>
 <br>
-☆ <u>辞書の読み込みが完了する(＝利用可能になる) と</u><br>
+<div class="indent1">☆ <u>辞書の読み込みが完了する(＝利用可能になる) と</u><br>
 ・[単一辞書選択の場合] その辞書名が画面左上に表示されます。<br>
 ・[複数辞書選択の場合] 画面左上の辞書名のところに、選択された辞書の番号が表示されます。
 最初は灰色で、辞書が読み込まれると色が変わります。
-<span class="small">[小ワザ]</span> それぞれの番号の上にマウスポインタをかざすと、その辞書名が表示されます。<br>
-☆ ダイアログのタイトルバーをマウス左ボタンを押しながらドラッグすると、
-移動させることができます。<br>
+<span class="small">[小ワザ]</span> それぞれの番号の上にマウスポインタをかざすと、その辞書名が表示されます。</div>
+<div class="indent1">☆ ダイアログのタイトルバーをマウス左ボタンを押しながらドラッグすると、
+移動させることができます。</div>
 
 <h2 id="options">オプション</h2>
 ボタン<img src="sistem_img/Tools.gif">をクリックすると、オプション・ダイアログが
@@ -274,11 +283,32 @@ init.jsの解説、言語の設定方法、辞書ファイルのフォーマッ�
 		○ 辞書形式変換について: <br>
 		見出し語部分→内配列<sup>*</sup>の要素[1]へ。
 		見出し語をひらがなに変換して要素[0]へ。<br>
-		訳の部分は要素[2]に。
+		訳の部分は要素[2]に。<br>
+		○ (v2.1 2016年)検索を便利にするために、原見出し中の＜…＞［…］を除去し、<br>
+		一つ一つ見出し語を組み立て、別見出しにした。<br>
+		主見出しは、＜…＞［…］を取り除いた部分とし、
+		この主見出しにエスペラント訳を入れた。<br>
+		また、見出し語をひらがな読みのUnicode順にソート。
 	</td></tr>
 
+	<tr><td colspan="2"><b>Kabe, Vortaro de Esperanto</b> (ID: kabe)</td></tr>
+	<tr><td>編者名、版</td><td>Kazimierz Bein, 1910</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: http://esperanto-akademio.wikispaces.com/space/content<br>
+			&nbsp;&nbsp;(リスト中の Kabe-1910-03-Sept-2014.pdf)<br>
+		○ ライセンス: (Public domain)<br>
+		○ 添付文書: <a href="vortaroj/kabe.html">kabe.html</a><br>
+		○ 辞書形式変換について: <br>
+		主見出しの中にある品詞派生、複合語をすべて個別の見出しとし、<br>
+		検索の助けとした。但し、語の定義は、原テキスト通り主見出しに置く。<br>
+		原本の見出し順は、品詞語尾(-o, -a, -iなど)を除いた部分で並んでいるが、<br>
+		Espvortarojの性質上、品詞語尾を含めてソートし直した。<br>
+		<span style="color:#cc0033;">
+		※現在収録のファイルは、校正途中のものです。</span>
+		</td></tr>
+
 	<tr><td colspan="2"><b>Esperanto-English Dictionary</b> (ID: espdic)</td></tr>
-	<tr><td>編者名、版</td><td>Paul Denisowski, 19 December 2013</td></tr>
+	<tr><td>編者名、版</td><td>Paul Denisowski, 2 August 2015</td></tr>
 	<tr><td>備考</td>
 		<td>○ ソース: http://www.denisowski.org/Esperanto/ESPDIC/espdic_readme.htm<br>
 		○ ライセンス: Creative Commons Attribution 3.0 Unported License<br>
@@ -293,7 +323,7 @@ init.jsの解説、言語の設定方法、辞書ファイルのフォーマッ�
 	<tr><td>備考</td>
 		<td>○ ソース: http://esperilo.be/butler.htm<br>
 		電子化 Bernhard Pabst. Berlino 2014. (2014-06-26改訂)<br>
-		○ ライセンス: (収録許可取得中)<br>
+		○ 著作権者: Montagu C. Butler / The British Esperanto Association<br>
 		○ 添付文書: <a href="vortaroj/butler-intro.html">butler-intro.html</a>,
 		<a href="vortaroj/butler-appendix.html">butler-appendix.html</a><br>
 		○ 辞書形式変換について: <br>
@@ -303,8 +333,9 @@ init.jsの解説、言語の設定方法、辞書ファイルのフォーマッ�
 		見出し語を、内配列<sup>*</sup>の要素[0],[1]へ。<br>
 		要素[0]は、ハイフン除去。
 		その他の部分を、HTML形式のまま内配列[2]へ。<br>
-		※現在(2014-06-26)電子版テキスト(HTML)は、まだ充分校正されていない。<br>
-		※辞書検索のため一部修正した。
+		※辞書検索のため一部修正した。<br>
+		<span style="color:#cc0033;">
+		※収録ファイルは現在、まだ充分に校正されていません。</span>
 	</td></tr>
 
 	<tr><td colspan="2"><b>English-Esperanto Dictionary</b> (ID: engesp1906)</td></tr>
@@ -316,6 +347,21 @@ init.jsの解説、言語の設定方法、辞書ファイルのフォーマッ�
 		○ 辞書形式変換について: <br>
 		原本見出しの = の左側を、内配列<sup>*</sup>の要素[0]に。要素[1]=""。<br>
 		= の右側を内配列[2]に。
+	</td></tr>
+
+	<tr><td colspan="2"><b>Komputeko, English-Esperanto</b> (ID: komputeko)</td></tr>
+	<tr><td>編者名、版</td><td>Komputeko.net (La reta projekto de E@I), 2015</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: komputeko.net より XLSファイル入手 (2015年5月版)<br>
+		○ ライセンス: Komputeko創始者Yves Nevelsteen氏 により許可済<br>
+		○ 添付文書: <a href="vortaroj/komputeko.html">komputeko.html</a><br>
+		○ 辞書形式変換について: <br>
+		英語の主/副単語をそれぞれ個別の見出しに入れた。<br>
+		但しエスペラント訳は、主見出しの方に入れた。<br>
+		品詞区分は、エスペラント訳の先頭[...]内に付加。 <br>
+		エスペラント訳に代替訳がある場合、セミコロン(;)で区切った。<br>
+		原本で同一英語見出しが複数個ある場合(品詞が違う場合)、
+		見出しは一つにして、訳を 1. ... 2. ... と番号で分けた。
 	</td></tr>
 
 </table>
@@ -335,6 +381,6 @@ init.jsの解説、言語の設定方法、辞書ファイルのフォーマッ�
 ※ <a href="history_ja.html">改訂履歴</a><br>
 ※ 不具合報告、お問い合わせ、ご意見、ご要望などは <img src="sistem_img/Email-address.gif">へどうぞ。<br>
 ※ ホーム・ページ <a href="http://esperanto.mond.jp/index.html#espvortaroj">(Verda Monteto)</a><br>
-(2014-08-01)<br>
+(2016-3-28)<br>
 </body>
 </html>

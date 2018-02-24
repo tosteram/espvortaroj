@@ -1,13 +1,13 @@
-// 2014-07-05; 07-30
+// 2014-07-05; 07-30, 08-23
 // lingvo: esperanto
 
 // id
 var lang_href_help= "help_eo.html";	//href
 var lang_button= {
-	btn_search:"Serĉu",
-	btn_delete:"Forigu tuton",
-	btn_toPool:"Akumulu tuton",
-	btn_emptyPool:"Malplenigu",
+	btn_search:"Serĉi",
+	btn_delete:"Forigi tuton",
+	btn_toPool:"Akumuli tuton",
+	btn_emptyPool:"Malplenigi",
 };
 var lang_lbl= {
 	// id
@@ -49,7 +49,7 @@ var lang_lbl= {
 	lbl_pool:"Akumulejo",
 
 	lbl_msgtitle: "Eraro",
-	lbl_msgclose: "Fermu",
+	lbl_msgclose: "Fermi",
 };
 
 var lang_str= {
@@ -66,14 +66,14 @@ var lang_str= {
 // tips
 var lang_tips= {
 	"help": "Helpo",
-	"select_dicts": "Elektu la celajn vortarojn",
+	"select_dicts": "Elekti la celajn vortarojn",
 	"searchHistory": "Serĉhistorio",
-	"clear_search_str": "Forviŝu",
+	"clear_search_str": "Forviŝi",
 	"show_search_opts": "Serĉaj opcioj",
 	"imgSettings": "Montraj opcioj",
-	"img_pool": "Fermu/Malfermu",
-	"imgClose1": "Fermu",
-	"imgClose2": "Fermu",
+	"img_pool": "Fermi/Malfermi",
+	"imgClose1": "Fermi",
+	"imgClose2": "Fermi",
 };
 
 callback_lang();

@@ -3,8 +3,12 @@ File	regilo.js
 Date:
 2014-07-09	Espvortaroj version 1.0
 2014-07-31	version 2.0
+2014-08-03~15	v2.1
+2015-05-15~23	v2.2 link to "vorto:xxx"; do search after selecting from history. 
+					search history
+	06-15	use cookie ??;
 
-Copyright (C) 2014, Tositaka TERAMOTO & FUKUMOTO Hirotsugu.
+Copyright (C) 2014-2015, Tositaka TERAMOTO & FUKUMOTO Hirotsugu.
 Permission to use, copy, modify, and distribute this software and 
 its documentation for any purpose (including commercial use) is hereby granted 
 without fee, provided that the above copyright notice appear in all 
@@ -102,11 +106,15 @@ window.onload= function() {
 			addEventHandler(imgs[i], "mouseout", hideTip);
 		}
 	}
-	
+
 	initDragDrop();
 
 	// make SelDictsDialog and load dictionaries after having read the language js
 	// in callback_lang()
+
+//	var schhistory= getCookie("schhistory");
+//	if (schhistory)
+//		searchHistory= schhistory.split(',');
 
 	document.getElementById("searchstr").focus();
 }
@@ -344,6 +352,10 @@ function inputSearchStr(e) {
 		showSearchHistory();
 		cancel= true;
 	}
+	else if (key==27) {		//27 [Esc]
+		setTimeout("clearSearchStr()", 100);
+		cancel= true;
+	}
 //	else {
 //		//Other char key
 //		setTimeout(search, 10);
@@ -364,13 +376,17 @@ function inputSearchStr(e) {
 function addToStack(stack, item, max) {
 	var i;
 	for (i=0; i<stack.length; ++i) {
-		if (stack[i]==item)			//the same data exists
-			return;
+		if (stack[i]==item) {		//the same data exists
+			stack.splice(i, 1);		// delete it
+			break;
+		}
 	}
 	stack.push(item);
 	if (stack.length>max) {
 		stack.shift();
 	}
+
+//	createCookie("schhistory", stack.join(','), 1, "/");
 }
 
 function search() {
@@ -447,14 +463,13 @@ function getSelectedDicts() {
 
 function search_entries(dicts, schstr, frag_ent, frag_def, maxdefs) {
 	var colorize= document.getElementById("chk_colorize").checked;
-	var arr=[];
+	var arr=[];	// [[name,index],...]
 	var n;
 	for (n=0; n<dicts.length; ++n) {
 		var name= dicts[n];
 		var D= dictionaries[name];
 		var Dict= D.dict;
-		var color= o_dicts[name].color;
-
+		
 		var str= D.conv1(schstr);
 		var re;
 		var schAllEntries= false;
@@ -469,12 +484,8 @@ function search_entries(dicts, schstr, frag_ent, frag_def, maxdefs) {
 
 		var matched= false;
 		for (var i=0; i<Dict.length; ++i) {
-			var entry= Dict[i];
-			if (re.test(entry[0])) {
-				var div= D.makeEntry(entry, name+" "+i, "r");
-				if (colorize)
-					div.style.backgroundColor= color;
-				arr.push(div);
+			if (re.test(Dict[i][0])) {
+				arr.push([name, i]);
 				matched=true;
 			}
 			else if (matched && !schAllEntries) {
@@ -496,20 +507,24 @@ function search_entries(dicts, schstr, frag_ent, frag_def, maxdefs) {
 
 	var count=0;
 	for (n=0; n<arr.length; ++n) {
-		var attr= arr[n].getAttribute("params");
-		var params= attr.split(' ');
-		var name= params[0];
-		var idx= parseInt(params[1]);
+		var name= arr[n][0];
+		var idx= arr[n][1];
 		var D= dictionaries[name];
-		//
-		frag_ent.appendChild(arr[n]);
-
 		var entry= D.dict[idx];
+		var color= o_dicts[name].color;
+
+		//
+		var div= D.makeEntry(entry, name+" "+idx, "r");
+		if (colorize)
+			div.style.backgroundColor= color;
+
+		frag_ent.appendChild(div);
+
 		++count;
 		if (count<=maxdefs) {
-			var div= makeDefWButton(D.makeDef, entry, IMG_add, name);
+			div= makeDefWButton(D.makeDef, entry, IMG_add, name);
 			if (colorize)
-				div.style.backgroundColor= o_dicts[name].color;
+				div.style.backgroundColor= color;
 			frag_def.appendChild(div);
 		}
 	}
@@ -569,10 +584,10 @@ function isAllAlphabet(str) {
 //	return /^[a-z ĉĝĥĵŝŭ]+$/.test(str);
 }
 
-function compWords(div1, div2) {
-	var s1= getText(div1).toLowerCase();
-	var s2= getText(div2).toLowerCase();
-	return o_compstr(s1, s2);
+function compWords(elem1, elem2) {
+	var s1= dictionaries[elem1[0]].dict[elem1[1]][0];
+	var s2= dictionaries[elem2[0]].dict[elem2[1]][0];
+	return o_compstr(s1.toLowerCase(), s2.toLowerCase());
 }
 function compEspStr(s1,s2) {
 	var table={	'ĉ':'cx', 'ĝ':'gx', 'ĥ':'hx', 'ĵ':'jx', 'ŝ':'sx', 'ŭ':'ux'};
@@ -773,6 +788,7 @@ function romajiToHiragana(str) {
 	var i= 0;
 	while (i<str.length) {
 		var syl= "";	//syllable
+		var nxt= "";
 		while (i<str.length) {
 			var c= str.charAt(i);
 			++i;
@@ -787,7 +803,11 @@ function romajiToHiragana(str) {
 			else if (/[a-z]/.test(c)) {
 				syl += c;
 			}
-			else if (syl.length>0) {	//delimiter (ascii)
+			else if (/[ '-]/.test(c)) {	//delimiter
+				break;
+			}
+			else {
+				nxt= c;					//other ASCII chars
 				break;
 			}
 		}
@@ -807,8 +827,10 @@ function romajiToHiragana(str) {
 					outstr += kana;
 			}
 		}
+		if (nxt)
+			outstr += nxt;
 	}
-	
+
 	return outstr;
 }
 
@@ -860,6 +882,11 @@ var makeDef_html= function(entry) {
 	return div;
 }
 
+//<div params=... style=...>
+//  <img (xbtn)>
+//  <span><b>word</b>  </span>
+//  ..html_def..
+//</div>
 function makeDefWButton(makeDef, entry, button, dict) {
 	var div= makeDef(entry);
 	div.setAttribute("params", dict);
@@ -980,25 +1007,62 @@ function onDefClicked(evt) {
 			}
 		}
 	}
+	else if (target.nodeName=="A") {
+		if (target.href.indexOf("vorto:")==0) {
+			var def_div= target.parentNode;
+			var dicID= def_div.getAttribute("params");
+			var D= dictionaries[dicID];
+			var Dict= D.dict;
+			var vorto= decodeURI(target.href.substring(6));	//conv. %xx
+			var re= new RegExp("^"+vorto+"$", "i");
+			var entry= false;
+			for (var i=0; i<Dict.length; ++i) {
+				if (re.test(Dict[i][0])) {
+					entry= Dict[i];
+					break;
+				}
+			}
+			if (entry) {
+				var imgsrc= def_div.firstChild.src;
+				var div= makeDefWButton(D.makeDef, entry, imgsrc, dicID);
+				if (document.getElementById("chk_colorize").checked)	//colorize?
+					div.style.backgroundColor= o_dicts[dicID].color;
+				def_div.parentNode.replaceChild(div, def_div);
+			}
+			// cancel the propagation
+			if (isIE()) {
+				evt.returnValue= false;
+				evt.cancelBubble= true;
+			} else {
+				evt.preventDefault();
+				evt.stopPropagation();
+			}
+		}
+//		else {
+//			allow event
+//		}
+	}
 	else if (target.nodeName=='B') {
 		// tricky !
 		var dicID= target.parentNode.parentNode.getAttribute("params");
 		if (dicID)
-			showDictNameTip(dicID, evt, true);
+			showDictNameTip(dicID, evt, 1500);
 	}
+	// focus on the search box
+	document.getElementById("searchstr").focus();
 }
 
-function showDictNameTip(dicID, evt, erase) {
+function showDictNameTip(dicID, evt, msec) {
 	var dicname= dictionaries[dicID]["name"];
 
+	clearTimeout(o_tiptimer);
 	var elem=document.getElementById("tip");
 	elem.style.left= (evt.clientX+15)+"px";
 	elem.style.top= (evt.clientY)+"px";
 	elem.innerHTML= dicname;
 	elem.style.display="inline";
 
-	if (erase)
-		setTimeout("document.getElementById('tip').style.display='none'", 1500);
+	o_tiptimer= setTimeout("hideTip()", msec);
 }
 
 function showDictName(evt) {
@@ -1011,7 +1075,7 @@ function showDictName(evt) {
 		target= evt.target;
 
 	if (target.className=='dict_n') {
-		showDictNameTip(target.getAttribute('params'), evt, false);
+		showDictNameTip(target.getAttribute('params'), evt, 3000);
 	}
 }
 
@@ -1088,6 +1152,7 @@ function onSearchHistory(evt) {
 	while (ch) {
 		if (ch.selected) {
 			inpElem.value= getText(ch);
+			search();
 			break;
 		}
 		ch= ch.nextSibling;
@@ -1234,6 +1299,23 @@ function removeEventHandler(elem, evtname, handler) {
 		elem.detachEvent(evtname, handler);
 	else
 		elem.removeEventListener(evtname, handler, false);
+}
+
+// http://www.sitepoint.com/how-to-deal-with-cookies-in-javascript/
+function createCookie(name, val, days, path, domain) {
+	var date= new Date();
+	date.setTime(date.getTime()+(days*24*60*60*1000));
+	var cookie= name+"="+val+"; expires="+date.toGMTString();
+	if (path)
+		cookie += "; path="+path;
+	if (domain)
+		cookie += "; domain="+domain;
+	document.cookie= cookie;
+}
+function getCookie(name) {
+	var regexp = new RegExp("(?:^" + name + "|;\s*"+ name + ")=(.*?)(?:;|$)", "g");
+	var result = regexp.exec(document.cookie);
+	return (result === null) ? null : result[1];
 }
 
 function deleteAllDefs(defpane) {
@@ -1435,6 +1517,7 @@ function onMouseUp(evt) {
 }
 
 // show tip
+var o_tiptimer;
 function showTip() {
 	var evt;
 	if (window.event)
@@ -1445,20 +1528,23 @@ function showTip() {
 	var targetId= (isIE()? evt.srcElement: evt.target).id;
 	var tip= lang_tips[targetId];
 	if (tip) {
+		clearTimeout(o_tiptimer);
 		var elem=document.getElementById("tip");
 		elem.style.left= (evt.clientX+15)+"px";
 		elem.style.top= (evt.clientY)+"px";
 		elem.innerHTML= tip;
 		elem.style.display="inline";
+		o_tiptimer= setTimeout("hideTip()", 3000);
 	}
 }
 function hideTip() {
+	clearTimeout(o_tiptimer);
 	document.getElementById("tip").style.display="none";
 }
 
 // message box
-var o_timer;
-var o_timecount;
+var o_msgtimer;
+var o_msgtimecount;
 
 function showMessageBox(msg) {
 	var msgtext= document.getElementById("msgtext");
@@ -1467,25 +1553,25 @@ function showMessageBox(msg) {
 	elem.style.opacity="1.0";
 	elem.style.filter="alpha(opacity=100)";
 	elem.style.display="block";
-	o_timecount=50;
-	o_timer= setTimeout("blurMsgbox()", 100);
+	o_msgtimecount=50;
+	o_msgtimer= setTimeout("blurMsgbox()", 100);
 }
 function closeMessageBox() {
 	document.getElementById("messagebox").style.display="none";
-	clearTimeout(o_timer);
+	clearTimeout(o_msgtimer);
 }
 function blurMsgbox() {
-	--o_timecount;
-	if (o_timecount==0) {
+	--o_msgtimecount;
+	if (o_msgtimecount==0) {
 		closeMessageBox();
 		return;
 	}
-	else if (o_timecount<=25) {
+	else if (o_msgtimecount<=25) {
 		var elem=document.getElementById("messagebox");
-		elem.style.opacity=(o_timecount/25.0);
-		var n= 100*o_timecount/25;
+		elem.style.opacity=(o_msgtimecount/25.0);
+		var n= 100*o_msgtimecount/25;
 		elem.style.filter="alpha(opacity="+n+")";
 	}
-	o_timer= setTimeout("blurMsgbox()", 100);
+	o_msgtimer= setTimeout("blurMsgbox()", 100);
 }
 
