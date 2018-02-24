@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 2014-06-27 作成 -->
+<title>エスペラント辞書 ヘルプ</title>
+<style type="text/css">
+	h1 {font-size:15pt; border-bottom:2px solid grey; padding-bottom:1px;}
+	h2 {font-size:13pt; border-bottom:1px dashed grey; padding-bottom:1px;}
+	table {border:solid 1px grey; border-collapse:collapse;}
+	td {border:solid 1px grey; padding-left:2px; padding-right:3px; min-width:10px;}
+	.small {font-size:smaller;}
+</style>
+</head>
+
+<body style="max-width:190mm; margin-left:3mm; line-height:1.3em; font-family:sans-serif; font-size:12pt; color:#404040;">
+<h1>エスペラント辞書ソフト(Espvortaroj)の使い方</h1>
+
+上段のテキストボックスに検索文字列を入力して、[Enter]キーを押します。<br>
+このとき、「検索範囲」が<br>
+<ul>
+	<li><b>見出し語</b>の場合<br>
+	<b>和エス辞書</b>のときは、<u>ひらがな</u> または <u>ローマ字</u> で入力してください。<br>
+	※ カタカナ語の長音は、ー[長音記号]、－[全角ハイフン]、または母音で入力します。<br>
+	&nbsp; 例: ケースは「けーす」「け－す」「けえす」と入力。
+	ローマ字の場合は 「keesu」<br>
+	※ ローマ字入力の注意点: 基本的に訓令式ローマ字ですが、ヘボン式でも入力できます。<br>
+	&nbsp; 外来語音: てぃ→thi、でぃ→dhi、とぅ→thu、どぅ→dhu<br>
+	&nbsp; 小文字は l (エル)を付けます: la→ぁ、lya→ゃ、など<br>
+	&nbsp; 「ん」の後のあ行、や行音は、その間に区切り文字(' - 空白)をいれます:<br>
+	&nbsp; 例: kon'yaku, kon-yaku, kon yaku → 「こんやく」、konnyaku は 「こんにゃく」;<br>
+	&nbsp; &nbsp; zen'in, zen-in, zen in → 「ぜんいん」、zenin は 「ぜにん」<br>
+	<br>
+	<b>エス和(など)</b>のときは、
+	<u>アルファベット</u> で入力してください。<br>
+	※ X記法が使えます: ĉ→cx, ĝ→gx, ĥ→hx, ĵ→jx, ŝ→sx, ŭ→ux<br>
+	&nbsp; 例: ŝanĝiは、sxangxiと入力。もし可能ならŝanĝiでもOKです<br>
+	<br>
+	</li>
+	<li><b>全文</b>の場合<br>
+	入力された <u>アルファベット、漢字かな</u> に一致する文字列を検索します。
+	入力文字列がテキストの一部に一致していれば、ヒットします。<br>
+	※ アルファベット入力では、X記法が使えます。<br>
+	※「全文」は、見出し語[漢字とひらがな]及び訳語、用例を含みます</li>
+</ul>
+
+検索で見つかった見出し語が、左欄に表示されます。
+また、右欄パネルには、それぞれの見出しの内容(訳語、用例など)が表示されます。<br>
+<br>
+「<b>全消去</b>」ボタンをクリックすると、内容がクリアされます。<br>
+左欄の見出し語をクリックすると、その内容が右パネルに表示されます。<br>
+<br>
+<b>検索履歴</b> : &nbsp;
+ボタン(<img src="sistem_img/Down.gif">)をクリック、または[↓]キーを押すと、
+今までの入力履歴が表示されます。マウスで選択クリック、または矢印キー[↑] [↓]で
+選択して[Enter]キーを押すと、テキストボックスに入力されます。
+何もせず消すときは、履歴ボックス以外の所をクリックするか、[Esc]キーを押してください。<br>
+<br>
+
+<h2>辞書の選択</h2>
+画面左上のボタン(<img src="sistem_img/Book.gif">)または辞書名をクリックすると、
+辞書選択ダイアログが表示されます。検索対象の辞書を選択してください。<br>
+○ 辞書を選択すると、<img src="sistem_img/Book.gif">が表示され、
+[OK]ボタンをクリックすると、メモリーに読み込まれ(ロードされ)ます。<br>
+&nbsp; 既に読み込まれている辞書を選択すると、ダイアログが消え、直ぐに利用できます。<br>
+○ 読み込まれるのは、選択されている辞書だけです。
+既に読み込まれている辞書には<img src="sistem_img/Book.gif">が表示されます。<br>
+○ <img src="sistem_img/Book.gif">をクリックすると、(検索対象として選択されていない時)
+<img src="sistem_img/Unladen.gif">となり、[OK]ボタンクリック後、
+辞書データが解放されます。
+ただし、メモリー管理は通常ブラウザーが行っているので、
+完全にブラウザーからOS(オペレーティング・システム)側に解放されるとは限りません。<br>
+
+<h2>検索オプション</h2>
+検索範囲の横のボタン(<img src="sistem_img/Gear.gif">)をクリックすると、
+検索方法を変更できます。<br>
+<br>
+<b>見出し語検索</b>で
+<ul>
+	<li>○ <b>入力文字列で開始する</b><br>
+	入力された文字列で始まる見出し語を検索します。<br>
+	和エスの例: かご → 籠、駕籠、加護、化合、過言 がヒットします。<br>
+	</li>
+	<li>○ <b>入力文字列を含む</b><br>
+	例: かご → 赤子、籠、駕籠、加護、化合、過言、シカゴ… などがヒットします。</li>
+	<li>○ <b>完全一致</b><br>
+	例: かご → 籠、駕籠、加護 がヒットします。<br>
+	</li>
+</ul>
+<b>全文検索</b>で
+<ul>
+	<li>□ <b>単語(アルファベット)</b><br>
+	単語(アルファベットのみ)を検索します。
+	(漢字かな入力の場合は無視されます)<br>
+	[注意] このオプションは現在(部分的に)正しく動作しません:
+	字上符の付いた文字が単語の切れ目と判断されるため。<br>
+	&nbsp; 例: paroliで検索するとkontraŭparoli などがヒットします。 </li>
+</ul>
+
+<h2>表示オプション</h2>
+右パネルにあるボタン(<img src="sistem_img/Gear.gif">)をクリックすると、
+内容(訳語、用例)表示の方法を変更できます。<br>
+<ul>
+	<li>□ <b>検索後内容表示</b><br>
+	<u>ON</u>にすると、検索後、直ぐに全見出し語の内容を表示します (既定値)。
+	ただし、下記の「最大表示個数」まで。<br>
+	<u>OFF</u>にすると、検索直後は、見出し一覧が表示されるだけです。</li>
+
+	<li>□ <b>内容保持</b><br>
+	<u>ON</u>にすると、検索後、前の内容は消去されません。<br>
+	<u>OFF</u>にすると、検索後、前の内容は消去されます (既定値)。</li>
+
+	<li>□ <b>収納箱を使う</b><br>
+	<u>ON</u>にすると、収納箱機能<span class="small">(次節参照)</span>が有効になります。<br>
+	<u>OFF</u> 収納箱を使いません (既定値)。</li>
+
+	<li><b>見出し語を選択</b>(クリック)したとき:<br>
+	○ <b>上へ追記</b> : 見出し語をクリックすると、最上段に選択語の内容を表示します
+		(既定値)。<br>
+	○ <b>下へ追記</b> : 見出し語をクリックすると、最下段に選択語の内容を表示します。<br>
+	○ <b>選択語のみ表示</b> : クリックした見出し語の内容のみ表示します。</li>
+
+	<li><b>最大表示個数</b><br>
+	右内容パネルに表示される見出しの最大個数です (既定値 100)。<br>
+	※ 検索後、最大この設定個数まで表示されます。
+	(ヒットした見出し語は総て一覧表示されますが、
+	見出し語がこれより多すぎる場合、後の語が右パネルに内容表示されません。)<br>
+	※ 上/下追記で表示して、最大個数を超えた場合、
+	古い項目から削除されます。<br></li>
+</ul>
+
+<h2>収納箱について</h2>
+「収納箱」とは、一時的に見出し(訳語など)を溜めておく場所です。
+表示オプションで「収納箱を使う」をONにしてください。<br>
+<br>
+次のように、使います:<br>
+○ 検索で表示された見出しの頭の <img src="sistem_img/Add.gif"> をクリックすると、その見出しが収納箱に移動します。
+収納箱は、右パネルの上部に表示されます。<br>
+○ [すべて収納]ボタンをクリックすると、表示されている検索結果がすべて収納箱に移動します。<br>
+<br>
+収納箱の各見出しの頭の <img src="sistem_img/Remove.gif"> をクリックすると、その見出し内容が削除されます。<br>
+[空にする]ボタンをクリックすると、収納箱が空(から)になり、消えます。<br>
+収納箱左上の <img src="sistem_img/Open.gif"> をクリックすると、収納箱が閉じられ、内容が隠されます。<img src="sistem_img/Closed.gif">をクリックすると、再び内容が表示されます。<br>
+<br>
+[注1] 収納箱機能を利用しない時は、<img src="sistem_img/Add.gif">, <img src="sistem_img/Remove.gif"> をクリックすると、辞書名が１秒間表示されます。<br>
+[注2] 収納箱を表示中に、「収納箱を使う」をOFFにしても、収納箱は残っています。<br>
+[注3] [全消去]をクリックしても、収納箱の内容は消去されません。<br>
+<br>
+
+<h2>js/init.js について</h2>
+次の項目が定義されています。
+<ul>
+	<li>言語</li>
+	<li>使用できる辞書</li>
+	<li>起動時の辞書</li>
+	<li>オプション初期値</li>
+</ul>
+init.jsファイルを編集すると、表示言語、辞書の追加・削除、起動時の辞書やオプションを
+変更できます。<br>
+言語は、ブラウザーで使用している言語が自動で選ばれます
+(日本語と英語とエスペラントがあります。その他の言語表示も自作すれば可能です)。<br>
+init.jsの解説、言語の設定方法、辞書ファイルのフォーマットは <a href="strukturo_ja.html">こちら</a> をご覧ください。<br>
+<br>
+
+<h2>収録辞書</h2>
+
+<table>
+	<tr><td colspan="2"><b>和エス辞典</b> (ID: kaji)</td></tr>
+	<tr><td>編者名、版</td><td>梶弘和編、1957年</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: 福本博次氏が電子化 2011-2012年<br>
+		○ 著作権者: 梶弘和<br>
+		○ 添付文書: <a href="vortaroj/kajiwaes.html">kajiwaes.html</a><br>
+		○ 辞書形式変換について: kajivortaro_UNI_20120622.txt から変換<br>
+		⑦読み方→内配列<sup>*</sup>要素[0]、
+		⑥日本語→要素[1]、⑧説明部分→要素[2]</td></tr>
+
+	<tr><td colspan="2"><b>実用エスペラント小辞典</b> (ID: pejv)</td></tr>
+	<tr><td>編者名、版</td><td>広高正昭編、v1.80、2010-10-30</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: http://www.vastalto.com/jpn/#e-Dic<br>
+		○ ライセンス: 非商業的利用に限り自由かつ無料<br>
+		○ 添付説明書（<a href="vortaroj/pejv_gvidilo.txt">gvidilo.txt</a>, <a href="vortaroj/pejv_legumin.txt">legumin.txt</a>）<br>
+		○ 辞書形式変換について: "pejvo-utf8.txt"から変換。<br>
+		見出し語部分→内配列<sup>*</sup>の要素[0]へ。
+		ただし、両端の - と、間の / 除去、小文字化。<br>
+		見出し語部分→要素[1]に。<br>
+		訳の部分で{Ｏ}{Ｂ}を内配列の要素[3]に置く。その他は要素[2]に。<br>
+		再ソート。
+	</td></tr>
+
+	<tr><td colspan="2"><b>電子版エスペラント日本語単語集</b> (ID: pevl)</td></tr>
+	<tr><td>編者名、版</td><td>広高正昭,小野隆夫 他編、1997-01-06</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: http://www.vastalto.com/jpn/#e-Dic<br>
+		○ ライセンス: フリーウエア。基本的に著作権フリー，無料で自由に利用，再配布可。<br>
+		○ 添付説明書: <a href="vortaroj/PEVL-instr.txt">PEVL-instr.txt</a><br>
+		○ 辞書形式変換について: "PEVL.TXT"から変換。<br>
+		見出し語部分→内配列<sup>*</sup>の要素[0]へ。
+		ただし、両端の - と、間の / 除去、小文字化。<br>
+		見出し語部分→要素[1]に。<br>
+		訳の部分で{Ｏ}{Ｂ}を内配列の要素[3]に置く。その他は要素[2]に。<br>
+		再ソート。
+	</td></tr>
+
+	<tr><td colspan="2"><b>日エス対照動植物名リスト</b> (ID: bestplant)</td></tr>
+	<tr><td>編者名、版</td><td>野村忠綱 1988-1994</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: http://vastalto.com/arkivo/jenbp.html<br>
+		○ ライセンス: 野村氏に収録許可取得済み<br>
+		○ 添付文書: <a href="vortaroj/bestplant.html">bestplant.html</a><br>
+		○ 辞書形式変換について: <br>
+		見出し語部分→内配列<sup>*</sup>の要素[1]へ。
+		見出し語をひらがなに変換して要素[0]へ。<br>
+		訳の部分は要素[2]に。
+	</td></tr>
+
+	<tr><td colspan="2"><b>Esperanto-English Dictionary</b> (ID: espdic)</td></tr>
+	<tr><td>編者名、版</td><td>Paul Denisowski, 19 December 2013</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: http://www.denisowski.org/Esperanto/ESPDIC/espdic_readme.htm<br>
+		○ ライセンス: Creative Commons Attribution 3.0 Unported License<br>
+		○ 辞書形式変換について: <br>
+		見出し語部分→内配列<sup>*</sup>の要素[0]へ。ただし、両端の - 除去、小文字化。<br>
+		要素[1]には、見出し語そのまま(要素[0]と異なる時)。<br>
+		訳語の部分は、そのまま要素[2]へ。<br>
+		要素[0]で再ソート。</td></tr>
+
+	<tr><td colspan="2"><b>Esperanto-English Dictionary</b> (ID: butler)</td></tr>
+	<tr><td>編者名、版</td><td>Montagu C. Butler, 1967</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: http://esperilo.be/butler.htm<br>
+		電子化 Bernhard Pabst. Berlino 2014. (2014-06-26改訂)<br>
+		○ ライセンス: (収録許可取得中)<br>
+		○ 添付文書: <a href="vortaroj/butler-intro.html">butler-intro.html</a>,
+		<a href="vortaroj/butler-appendix.html">butler-appendix.html</a><br>
+		○ 辞書形式変換について: <br>
+		HTMLを平文(plain text)に変換し、各行の先頭単語を、内配列<sup>*</sup>の要素[0],[1]へ。<br>
+		要素[0]は、ハイフン除去。
+		先頭単語を取り除いた部分を内配列[2]へ。<br>
+		現在(2014-06-26)電子版テキスト(HTML)は、まだ充分校正されていない。<br>
+		辞書検索のため一部修正した。
+	</td></tr>
+
+	<tr><td colspan="2"><b>English-Esperanto Dictionary</b> (ID: engesp1906)</td></tr>
+	<tr><td>編者名、版</td><td>John Charles O'Connor and Charles Frederic Hayes, 1906</td></tr>
+	<tr><td>備考</td>
+		<td>○ ソース: http://www.gutenberg.org/files/16967/16967-0.txt<br>
+		○ ライセンス: Project Gutenberg License<br>
+		○ 添付文書: <a href="vortaroj/PG16967-0.txt">PG16967-0.txt</a><br>
+		○ 辞書形式変換について: <br>
+		原本見出しの = の左側を、内配列<sup>*</sup>の要素[0]に。要素[1]=""。<br>
+		= の右側を内配列[2]に。
+	</td></tr>
+
+</table>
+(*内配列: <a href="strukturo_ja.html#dict_format">辞書のフォーマット</a>を参照)<br>
+<br>
+<hr>
+エスペラント辞書ソフト"Espvortaroj"は、非商業的利用に限り自由にダウンロードして使用できます。<br>
+その他の辞書も、以下の条件でEspvortarojで使えるように、フォーマット変換致します。<br>
+&nbsp; 1. 原則的に公開とし、無料で使用できる<br>
+&nbsp; 2. 著作権、ライセンス等に問題がないこと<br>
+&nbsp; 3. エスペラントの辞書<br>
+(これ以外の条件でも、場合によっては助言等のサポート致します。)<br>
+不具合報告、お問い合わせ、ご意見、ご要望などは <img src="sistem_img/Email-address.gif">へどうぞ。<br>
+ホーム・ページ <a href="http://esperanto.mond.jp/index.html">(Verda Monteto)</a><br>
+(2014-07-16)<br>
+</body>
+</html>

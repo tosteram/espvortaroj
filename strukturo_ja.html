@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 2014-07-04 作成 -->
+<title>Espvortaroj: 言語、辞書、オプション</title>
+<style type="text/css">
+	h1 {font-size:15pt; border-bottom:2px solid grey; padding-bottom:1px;}
+	h2 {font-size:13pt; border-bottom:1px dashed grey; padding-bottom:1px;}
+	h3 {font-size:12pt; padding-bottom:1px;}
+	.faint {color:grey; font-size:smaller;}
+</style>
+</head>
+
+<body style="max-width:190mm; margin-left:3mm; line-height:1.3em; font-family:sans-serif; font-size:12pt; color:#404040;">
+<h1>エスペラント辞書ソフト(Espvortaroj)の設定</h1>
+<div style="text-align:right;">(v1.0 2014-07-16)</div>
+
+js/init.js, 辞書ファイル、言語ファイルの設定・フォーマットについて解説します。<br>
+なお、ファイルはすべて <u><b>UTF-8</b> 文字セット</u>で作成してください。
+
+<h2 id="dict_settings">1. 辞書の設定</h2>
+js/init.jsの変数 <b>dictionaries</b> に、辞書選択ダイアログに表示する辞書を定義します。
+var dictionariesの各辞書定義項目は、次のようになります:<br>
+<pre>
+    <i>NAME_ID</i>: {
+        name:"○○○○", edition:"△△△△",
+        dict_js:"□□□.js", text:"xxx",
+        dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
+        },
+</pre>
+<b>NAME_ID</b> : 辞書を参照する ID です。<br>
+<b>name</b> : 表示名称<br>
+<b>edition</b> : 編者名、バーションなど<br>
+<b>dict_js</b> : 辞書ファイル名。(下記 <a href="#dict_file">3. 辞書ファイル</a>参照)<br>
+<b>text</b> : 辞書テキストのタイプ: plain または html  (ただし、現在plainのみ)<br>
+<b>dict, conv1, conv2, makeEntry, makeDef</b> : 辞書データと函数。
+後述の<a href="#dict_funcs">辞書定義</a>参照。ここでは、すべてnullに設定します。<br>
+<br>
+※ 辞書は動的に読み込まれます(必要な辞書だけメモリーにロードします)。
+「辞書の選択」ダイアログで選択した辞書のみメモリーに読み込まれます。<br>
+
+<h2 id="default_dict">2. 起動時の辞書</h2>
+js/init.jsの変数 <b>defaultDict</b> に上記辞書定義にある "<i>NAME_ID</i>" (ダブルクォートで囲む) を設定すると、
+その辞書が起動時に読み込まれ、検索対象の辞書となります。<br>
+defaultDict=null の場合は、起動後、辞書選択ダイアログが表示されます。<br>
+
+<h2 id="dict_file">3. 辞書ファイル</h2>
+辞書ファイルは"vortaroj"フォルダに置きます。「<a href="#dict_settings">1.辞書の設定</a>」の dict_js: にそのファイル名が指定されます。<br>
+辞書ファイルには、次の 辞書データー と 函数 を定義します。
+
+<h3 id="dict_format">■ 辞書データー</h3>
+<pre>
+var <i>DICT_DATA</i> = [
+    [...], <span class="faint">(内配列, 見出し一語)</span>
+    ...
+    ];
+</pre>
+辞書データーの配列です。五十音順またはABC順に並べてください。
+<i>DICT_DATA</i> は、一意の名前を使ってください。
+配列の要素は、一つの見出しになり、次の"内配列"形式になります:<br>
+[読み, 見出し語, 内容 (,その他のデーター, …)]<br>
+要素[0], [1], [2]は、この順序で必須です。
+「読み」は、見出し語検索で検索される文字列です。「見出し語」は、表示用です。
+「読み」と「見出し語」が同一の場合は、「見出し語」を "" として省略できます。
+「内容」の次の文字は変換しておいてください:<br>
+\ (バックスラッシュ、円記号) → \\<br>
+" (クォート) → \" <br>
+<!--
+&amp; → &amp;amp;<br>
+&lt; → &amp;lt;<br>
+&gt; → &amp;lgt<br>
+-->
+「その他のデーター」としては、例えば、語の分類や付属画像などがあるでしょう。
+これらは、次節の makeDef 函数で表示されることになるでしょう<br>
+
+<h3 id="dict_funcs">■ 函数</h3>
+<pre>
+var <i>FUNCS</i> = {
+    conv1: function(schstr) { .... },
+    conv2: function(schstr) { .... },
+    makeEntry: function(entry, params, klass) { .... }
+    makeDef: function(entry) { .... }
+};
+</pre>
+函数定義です。
+<i>FUNCS</i>は、一意の名前を使ってください。<br>
+<ul>
+	<li><b>conv1</b> : 見出し語検索するとき、入力文字列を変換する函数です。<br>
+	引数は、入力文字列。</li>
+	<li><b>conv2</b> : 全文検索するとき、入力文字列を変換する函数です。<br>
+	引数は、入力文字列。</li>
+	<li><b>makeEntry</b> : 見出し１個を見出し語リスト欄に表示する函数です。<br>
+	引数:<br>
+	* entry: 見出し"内配列"<br>
+	* params: 辞書IDとその見出しへのインデックス<br>
+	* klass: HTMLクラス ("r":通常見出し)<br>
+	返す値は、HTMLの&lt;div&gt;エレメントです(ここに表示される内容を設定します)。<br>
+	このdivの属性"params"に引数paramsを設定しておきます:<br>
+	&nbsp; <code>div.setAttribute("params", params)</code></li>
+	<li><b>makeDef</b> : 見出し１個の内容表示をする函数です。<br>
+	引数は、辞書データーの"内配列一個"。<br>
+	返す値は、HTMLの&lt;div&gt;エレメントです(ここに表示される内容を設定します)。</li>
+</ul>
+注1: 主な変換函数は、js/regilo.jsに定義されていますので、これを使ってください。
+	特殊な変換は、自分で作成する必要があります。<br>
+	* chapeligu(s)  : X記法から変換<br>
+	* romajiToHiragana(s) : ローマ字入力をひらがなに変換<br>
+	* longToVowel(s) : 長音記号を母音に変換<br>
+<br>
+注2: これら函数に null を設定すると、下記の既定の函数が呼ばれます:<br>
+<ul>
+	<li>conv1_default : chapeligu(s)</li>
+	<li>conv2_default : chapeligu(s)</li>
+	<li>makeEntry_default : 内配列の要素[1](または[0])をそのまま表示</li>
+	<li>makeDef_default : 見出し語(内配列[1])を太字で、
+	内容(訳・用例) (内配列[2])をそのまま表示</li>
+</ul>
+そして、最後にかならず、次の1行を書いてください。<br>
+<pre>
+callback("<i>NAME_ID</i>", <i>DICT_DATA</i>, <i>FUNCS</i>);
+</pre>
+<br>
+
+<h2 id="lang">4. 言語の設定</h2>
+表示言語は、js/init.jsの var <b>lang_file</b> に言語jsファイルを指定します。
+ファイル名は "lang_<i>LL</i>.js" とし、<i>LL</i>は <a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO 639.1</a>で定められている二文字の言語名にします。
+言語jsファイルは、jsフォルダに置きます。<br>
+lang_file=null の場合は、言語を自動判別します。
+その結果(言語名二文字)が、var <b>available_langs</b> にあれば、その言語を使用し、
+なければ、エスペラント表示になります。
+言語を追加するときは、available_langs にも追記してください。<br>
+
+言語jsファイルの内容は、実例(lang_eo.js, lang_en.js, lang_ja.js)をご覧ください。<br>
+主な変数の説明:<br>
+<pre>
+var lang_href_help : ヘルプ・ファイル名
+var lang_button : ボタンの表示文字列 (ボタンIDとvalue属性値)
+var lang_lbl : 固定的な文字列 (タグIDとそのテキスト)
+var lang_str : javascript regilo.js で使う
+var lang_tips : ボタンにマウス・ポインターをかざした時表示される
+</pre>
+最後に必ず、次の1行を書いてください。<br>
+<pre>
+callback_lang();
+</pre>
+<br>
+
+<h2 id="default_options">5. オプションの設定</h2>
+js/init.js で起動時の初期値を設定します。
+
+<pre>
+var defaultOpts= {
+    //search options (検索オプション)
+    <b>maxSearchHistory</b>: 20,  (最大検索履歴数)
+    <b>searchRange</b>: "range_entries" (見出し語) または, "range_entiretext"(全文)
+    <b>entrySearch</b>: "match_prefix" (前方一致) または,
+                  "match_partial" (部分一致), "match_complete" (完全一致)
+    <b>entiretext_wordSearch</b>: false, または, true (全文・単語検索)
+    //display options (表示オプション)
+    <b>showAfterSearch</b>: true, または, false (検索後内容表示)
+    <b>retain</b>: false, または true (内容保持)
+    <b>usePool</b>: false, または true (収納箱を使う)
+    <b>howDisplayDefs</b>: "prepend"(上に追記), または
+                  "append"(下に追記), "showone"(選択語のみ表示)
+    <b>maxDefs</b>: 100 (最大表示個数)
+};
+</pre>
+
+<hr>
+エスペラント辞書ソフト"Espvortaroj"は、非商業的利用に限り自由にダウンロードして使用できます。<br>
+その他の辞書も、以下の条件でEspvortarojで使えるように、フォーマット変換致します。<br>
+&nbsp; 1. 原則的に公開とし、無料で使用できる<br>
+&nbsp; 2. 著作権、ライセンス等に問題がないこと<br>
+&nbsp; 3. エスペラントの辞書<br>
+(これ以外の条件でも、場合によっては助言等のサポート致します。)<br>
+不具合報告、お問い合わせ、ご意見、ご要望などは <img src="sistem_img/Email-address.gif">へどうぞ。<br>
+ホーム・ページ <a href="http://esperanto.mond.jp/index.html">(Verda Monteto)</a><br>
+(2014-07-16)<br>
+</body>
+</html>
+

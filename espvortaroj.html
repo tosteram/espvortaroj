@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="icon" href="favicon.ico">
+<title>Esperantaj Vortaroj</title>
+<!-- Date: 2014-07-12 -->
+<!-- Copyright (C) 2013-2014, Tositaka Teramoto & Fukumoto Hirotsugu
+ Permission to use, copy, modify, distribute and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+ provided that the above copyright notice appear in all copies and
+ that both that copyright notice and this permission notice appear
+ in supporting documentation. 
+ This file is provided "as is" without express or implied warranty.
+-->
+<script src="js/init.js" type="text/javascript"></script>
+<script src="js/regilo.js" type="text/javascript"></script>
+
+<style type="text/css">
+	img.button {border-style:none; vertical-align:middle; cursor:pointer;}
+	img.btn {cursor:pointer;}
+	.button-c {border-bottom:solid 1px #800030; color:#800030; margin:5px 2px;
+		cursor:pointer;}
+	.button-c:hover {background-color:yellow;}
+	.button-simple-str {cursor:pointer;}
+	div.r {border-bottom:solid 1px grey; padding-top:1px; cursor:pointer;}
+	div.r:hover {background-color:yellow;}
+	div.g {border-bottom:solid 1px grey; padding-top:1px; background-color:lightgrey;
+		cursor:pointer;}
+	div.g:hover {background-color:yellow;}
+	div.k {font-weight:bold;border-bottom:solid 1px grey; padding-top:2px;
+		background-color:#b0ffb0}
+	div.dialog {position:absolute; border:2px solid lightgrey; padding:5px; z-index:50;
+		background-color:#f0f0f0; font-size:smaller;}
+	h6 {font-size:10pt; margin:5px 0px 0px 0px;}
+</style>
+</head>
+
+<body topmargin="0px" leftmargin="5px" rightmargin="5px" style="font-family:sans-serif; font-size:12pt;">
+
+<!-- === HEADER === -->
+<!-- ENTRY Pane -->
+<div id="entrypane" style="position:absolute; top:0px; left:5px; right:5px; Height:41px; background:url(sistem_img/headbg.gif) repeat-x; padding-top:10px;">
+
+<form>
+	<!-- HELP -->
+	<a id="help_doc" href="" target="_blank"><img src="sistem_img/Help.gif" id="help" class="button"></a>
+
+	<!-- Dictionary -->
+	<span class="button-simple-str" onclick="selectDicts()">
+		<img src="sistem_img/Book.gif" id="select_dicts" class="button" align="bottom">
+		<span id="dict_name" style="color:forestgreen;"></span>
+	</span>
+
+	<!-- Search -->
+	<input type="text" id="searchstr" style="width:130px; border:solid 1px grey; margin:0px;">
+	<!-- -->
+	<img src="sistem_img/Down.gif" id="searchHistory" class="button"
+		style="position:relative; left:-5px;" onclick="showSearchHistory()">
+	<!-- -->
+	<img src="sistem_img/Clear.gif" id="clear_search_str" class="button"
+		style="position:relative; left:-5px;" onclick="clearSearchStr()">
+	<input type="button" id="btn_search" value="-" onclick="search()"/>
+
+	<!-- Search range -->
+	<span style="margin-left:5px;border-bottom: 2px solid lightgrey; font-size:smaller;">
+		<span id="search_range"></span>&nbsp;
+		<label><input type="radio" name="schtype" id="range_entries" value="range_entries"
+			checked="checked"><span id="lbl_entries"></span></label>
+		<label><input type="radio" name="schtype" id="range_entiretext" value="range_entiretext"
+			onclick="changeRange()"><span id="lbl_entiretext"></span></label>&nbsp;
+	</span>
+	<img src="sistem_img/Gear.gif" id="show_search_opts" class="button"
+		onclick="showSearchOpts()">
+
+	<!-- dictionary selection -->
+	<div id="seldicts" class="dialog" style="display:none; top:35px; left:20px; width:250px;">
+		<!-- list of dictionaries -->
+	</div>
+
+	<!-- search history -->
+	<select id="selectSchHistory" style="display:none; position:absolute; margin:0px;width:145px; z-index:51;"
+		onclick="onSearchHistory()" onblur="this.style.display='none'">
+	</select>
+
+	<!-- Search options -->
+	<div id="searchOpts" class="dialog" style="display:none; top:10px; left:450px; width:235px;">
+		<img src="sistem_img/Close.gif" class="button" id="imgClose1" align="right"
+			onclick="showSearchOpts()"><br>
+		<h6 id="schopts_entry"></h6>
+		<label><input type="radio" name="schopt" id="match_prefix" value="match_prefix"
+			checked="checked">
+			<span id="schopts_prefix"></span></label><br>
+		<label><input type="radio" name="schopt" id="match_partial" value="match_partial">
+			<span id="schopts_contain"></span></label><br>
+		<label><input type="radio" name="schopt" id="match_complete" value="match_complete">
+			<span id="schopts_word1"></span></label><br>
+		<h6 id="schopts_entiretext"></h6>
+		<label><input type="checkbox" id="match_word_entiretext">
+			<span id="schopts_word2"></span></label>
+	</div>
+</form>
+</div> <!-- end. ENTRY pane -->
+
+<!-- RESULTS Pane -->
+<div id="results" style="display:block; border:solid 1px grey; position:absolute; top:50px; bottom:0px; left:5px; width:150px; overflow:auto;">
+	<span id="lbl_results"></span>
+</div> <!-- end. results pane -->
+
+<!-- DEF Pane -->
+<div id="defpane" style="border:solid 1px grey; position:absolute; top:50px; bottom:0px; left:160px; right:0px; padding-top:5px;">
+
+	<!-- buttons, setttings -->
+	<form>
+		<input type="button" id="btn_delete" value="-" onclick="deleteAll()">
+		<input type="button" id="btn_select" value="-" onclick="moveAllToPool()">
+		<img src="sistem_img/Gear.gif" id="imgSettings" class="button"
+			onclick="onShowDefSettings()">
+
+		<div id="dispOpts" class="dialog" style="display:none; top:5px; left:100px; width:170px;">
+			<img src="sistem_img/Close.gif" class="button" id="imgClose2" align="right"
+				onclick="onShowDefSettings()"><br>
+			<label><input type="checkbox" id="showdefs" value="showdefs"
+				checked="checked"> <span id="lbl_showdefs"></span></label><br>
+			<label><input type="checkbox" id="retain" value="retain">
+				<span id="lbl_retain"></span></label><br>
+			<label><input type="checkbox" id="usePool" value="usePool"
+				onclick="use_Pool(this)">
+				<span id="lbl_usePool"></span></label><br>
+			<br>
+			<span id="lbl_sel_entry" style="padding-left:5px"></span><br>
+			<label><input type="radio" name="showstyle" id="prepend" value="prepend"
+				checked="checked"> <span id="lbl_prepend"></span></label><br>
+			<label><input type="radio" name="showstyle" id="append" value="append">
+				<span id="lbl_append"></span></label><br>
+			<label><input type="radio" name="showstyle" id="showone" value="showone">
+				<span id="lbl_showone"></span></label><br>
+			<br>
+			<label style="padding:5px;">
+				<span id="lbl_maxdefs"></span><br>
+			<input type="text" id="maxdefs" value="100"
+				style="width:50px; margin-left:10px;"></label>
+		</div> <!-- end. def-settings -->
+	</form>
+
+	<!-- DEFINITIONS (do not put spaces between elements) -->
+	<div id="defs" style="position:absolute; top:30px; bottom:0px; left:0px; right:0px; overflow:auto;"><div id="pool" style="display:none; border:solid 1px green; margin-bottom:3px;"><img id="img_pool" class="button" src="" onclick="foldPool()"><span id="lbl_pool" style="font-weight:bold; color:green"></span>&nbsp; <input id="btn_emptyPool" type="button" value="-" onclick="emptyPool()"><div id="poolContent"></div></div></div> <!-- end. defs -->
+</div> <!-- end. defpane -->
+
+<!-- floating objects -->
+<span id="tip" style="display:none; border:solid 1px grey; 
+padding:2px; background-color:#ffffc0; position:absolute; 
+z-index:100;"></span>
+
+<div id="messagebox" style="display:none; border:double 3px blue; 
+background-color:beige; position:absolute; top:70px; opacity:1.0; 
+filter:alpha(opacity=100); z-index:60;">
+	<div style="color:white; background-color:blue; 
+text-align:center;">
+		<span id="lbl_msgtitle"></span>
+	</div>
+	<div id="msgtext" style="padding:10px;"></div>
+	<div style="text-align:right;">
+		<span id="lbl_msgclose" class="button-c" onclick="closeMessageBox()"></span>
+	</div>
+</div>
+
+</body>
+</html>
+

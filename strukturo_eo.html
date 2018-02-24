@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!-- 2014-07-04 作成 -->
+<title>Strukturo de Espvortaroj</title>
+<style type="text/css">
+	h1 {font-size:15pt; border-bottom:2px solid grey; padding-bottom:1px;}
+	h2 {font-size:13pt; border-bottom:1px dashed grey; padding-bottom:1px;}
+	h3 {font-size:12pt; padding-bottom:1px;}
+	.faint {color:grey; font-size:smaller;}
+	.star {color:darkblue; background-color:#e8ffe8;}
+</style>
+</head>
+
+<body style="max-width:190mm; margin-left:3mm; line-height:1.3em; font-family:Tahoma, Airal, sans-serif; font-size:12pt; color:#404040;">
+<h1>Strukturo de <i>Espvortaroj</i></h1>
+<div style="text-align:right;">(v1.0 2014-07-16)</div>
+
+Tiu ĉi dosiero klarigas agordojn en "js/init.js", lingvajn dosierojn, kaj vortaran formaton.<br>
+Ĉiuj dosieroj devas esti skribitaj per <u>la signaro UTF-8</u>.
+
+<h2 id="dict_settings">1. Agordoj de vortaroj</h2>
+Vortaroj uzataj devas esti difinitaj kun la variablo <b>dictionaries</b> en js/init.js. 
+Jen estas la elementoj de <i>dictionaries</i>:<br>
+<pre>
+    <i>NAME_ID</i>: {
+        name:"○○○○", edition:"△△△△",
+        dict_js:"□□□.js", text:"xxx",
+        dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
+        },
+</pre>
+<b>NAME_ID</b> : Identigilo por referenci la vortaron.<br>
+<b>name</b> : Montra nomo<br>
+<b>edition</b> : Redaktoro, Versio, Jaro de eldono, ktp.<br>
+<b>dict_js</b> : Dosiernomo de vortaro. (Ref. <a href="#dict_file">3. Vortaraj dosieroj</a> malsupre)<br>
+<b>text</b> : Tipo de vortarteksto: <i>plain</i> aŭ <i>html</i>&nbsp; (Nuntempe, nur <i>plain</i> estas subtenata.)<br>
+<b>dict, conv1, conv2, makeEntry, makeDef</b> : Datumoj de vortaro kaj funkcioj. 
+Referencu <a href="#dict_funcs">la difinojn de vortaro</a>. Ĉi tie atribuu <i>null</i> al ĉiuj.<br>
+<br>
+<span class="star">*</span> Vortaroj estos ŝarĝitaj dinamike (nur necesaj vortaroj, kiuj estis elektitaj sur la dialogujo "Elekti vortaron", estos ŝarĝitaj en la memoron).<br>
+<br>
+
+<h2 id="default_dict">2. Komenca vortaro</h2>
+Atribuu "<i>NAME_ID</i>" (menciita supre; duoblaj citiloj necesas) al la variablo <b>defaultDict</b> en js/init.js, por komenci la aplikaĵon kun la vortaro, kiu estos ŝarĝita ĉe startigo.<br>
+Se defaultDict=null, la dialogujo "Elekti vortaron" aperos ĉe startigo.<br>
+<br>
+
+<h2 id="dict_file">3. Vortaraj dosieroj</h2>
+Metu vortarajn dosierojn en la dosierujon "vortaroj". La dosiernomoj estas atribuitaj al la elemento <i>dict_js</i> menciita en <a href="#dict_settings">1. Agordoj de vortaroj</a>.<br>
+
+En la vortara dosiero, oni difinas vortaraj datumoj kaj funkcioj jenaj.
+
+<h3 id="dict_format">= Vortaraj datumoj =</h3>
+<pre>
+var <i>DICT_DATA</i> = [
+    [...], <span class="faint">(Interna Tabelo por unu kapvorto)</span>
+    ...
+    ];
+</pre>
+Tiu ĉi estas la tabelo de vortraj datumoj, kiuj devas esti alfabete-ordigitaj.
+Uzu unikan nomon por <i>DICT_DATA</i>.
+La tabelo konsistas el Internaj Tabeloj en la sekvanta formo:<br>
+[Serĉato, Kapvorto, Enhavo (, alia datumo, ...)]<br>
+La elementoj [0], [1], [2] estas devigaj en tiu ordo.
+<i>Serĉato</i> estas signovico kiu estos serĉita per Kapvorto-serĉado.
+<i>Kapvorto</i> estas uzata por montrado.
+Kiam <i>Serĉato</i> kaj <i>Kapvorto</i> estas egalaj, <i>Kapvorto</i> povas esti "".
+La sekvantaj literoj en <i>Enhavo</i> devas esti transformitaj jene:<br>
+\ (deklivo) → \\<br>
+" (citilo) → \" <br>
+<!--
+&amp; → &amp;amp;<br>
+&lt; → &amp;lt;<br>
+&gt; → &amp;lgt<br>
+-->
+<i>Aliajn datumojn</i> oni povas difini por vorta klasigo, rilataj imagoj, ktp., 
+kiuj estos montritaj per la funkcio <i>makeDef</i> klarigata en la sekvanta sekcio.<br>
+
+
+<h3 id="dict_funcs">= Funkcioj =</h3>
+<pre>
+var <i>FUNCS</i> = {
+    conv1: function(schstr) { .... },
+    conv2: function(schstr) { .... },
+    makeEntry: function(entry, params, klass) { .... }
+    makeDef: function(entry) { .... }
+};
+</pre>
+Tiuj estas funkciaj difinoj.
+Uzu unikan nomon por <i>FUNCS</i>.<br>
+<ul>
+	<li><b>conv1</b> : Transformas la enigan signovicon kiam oni serĉas kapvorton.<br>
+	La argumento estas eniga signovico.</li>
+	<li><b>conv2</b> : Transformas la enigan signovicon kiam oni serĉas en la tuta teksto.<br>
+	La argumento estas eniga signovico.</li>
+	<li><b>makeEntry</b> : Montras unu kapvorton en la lista rubriko.<br>
+	Argumentoj:<br>
+	<span class="star">*</span> <i>entry</i>: La "Interna Tabelo" de la kapvorto<br>
+	<span class="star">*</span> <i>params</i>: la vortara identigilo kaj la indekso al la kapvorto<br>
+	<span class="star">*</span> <i>klass</i>: HTML-klaso ("r": normala kapvorto)<br>
+	Liveras la elementon HTML &lt;div&gt;, en kiun estas metita la montrota enhavo.<br>
+	Notu: Atribuu la argumento <i>params</i> al la atributo "params" de la &lt;div&gt;:<br>
+	&nbsp; <code>div.setAttribute("params", params)</code></li>
+	<li><b>makeDef</b> : Montras la enhavo de unu vortarano.<br>
+	La argumento estas unu "Interna Tabelo" el la vortaranoj.<br>
+	Liveras la elementon HTML &lt;div&gt;, en kiun estas metita la montrota enhavo.<br>
+	</li>
+</ul>
+NOTO 1: Vi povas uzi la transformaj funkcioj difinitaj en js/regilo.js .
+Specialajn transformojn oni devas skribi per si mem.<br> Jen la funkcioj pretaj:<br>
+	<span class="star">*</span> chapeligu(s)  : Transformas <i>s</i> laŭ X-sistemo.<br>
+	<span class="star">*</span> romajiToHiragana(s) : Transformas latinajn literojn al hiragana.<br>
+	<span class="star">*</span> longToVowel(s) : Transformas signojn de longaj silaboj al vokalaj literoj.<br>
+<br>
+NOTO 2: Atribuu <i>null</i> al tiuj funkcioj por voki la defaŭltajn funkciojn:<br>
+<ul>
+	<li>conv1_default : chapeligu(s)</li>
+	<li>conv2_default : chapeligu(s)</li>
+	<li>makeEntry_default : Montras la neta elemento[1](aŭ [0]) de la Interna Tabelo.</li>
+	<li>makeDef_default : Montras la kapvorton (elemento[1] de la Interna Tabelo) kun dikaj literoj,
+	kaj la netan enhavon de elemento[2] de la Interna Tabelo.</li>
+</ul>
+Laste, nepre metu la jenan linion ĉe la plej malsupre.<br>
+<pre>
+callback("<i>NAME_ID</i>", <i>DICT_DATA</i>, <i>FUNCS</i>);
+</pre>
+<br>
+
+<h2 id="lang">4. Agordoj de lingvo</h2>
+La var <b>lang_file</b> en js/init.js havas la dosiernomon de lingvo montrata.
+La formo de la dosiernomo estas "lang_<i>LL</i>.js", kie <i>LL</i> estas la du-litera nomo difinita de <a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO 639.1</a>.
+Lingvaj dosieroj estas metita en la dosierujo "js".<br>
+Kiam lang_file=null, la lingvo estas elektita aŭtomete; se la rezulta lingvo (la du-litera nomo) troviĝas en var <b>available_langs</b>, tiu lingvo estos uzata; se ne troviĝas, Esperanto estos uzata.
+Kiam vi almetas lingvon, ne forgesu almeti la nomon ankaŭ en <i>available_langs</i><br>
+
+Vidu la enhavojn de ekzemplaj lingvaj dosieroj (lang_eo.js, lang_en.js, lang_ja.js).<br>
+Jen nur malneta klarigo de ĉefaj variabloj:<br>
+<pre>
+var lang_href_help : la nomo de Help-dosiero
+var lang_button : nomoj de butonoj (identigiloj kaj atributaj valoroj de butonoj)
+var lang_lbl : fiksitaj tekstoj (HTML-etikedaj identigiloj kaj siaj tekstoj)
+var lang_str : uzata en javascript regilo.js
+var lang_tips : aperos kiam la musmontrilo estas metita sur butonoj
+</pre>
+Ĉe la plej malsupre, nepre skribu la jenan linion:<br>
+<pre>
+callback_lang();
+</pre>
+<br>
+
+<h2 id="default_options">5. Agordoj de opcioj</h2>
+La komencaj valoroj de opcioj estas difinitaj en js/init.js .
+
+<pre>
+var defaultOpts= {
+    //search options (Serĉaj opcioj)
+    <b>maxSearchHistory</b>: 20,  (Makximuma nombro de enigaj signovicoj en serĉhistorio)
+    <b>searchRange</b>: "range_entries"(Kapvortoj) aŭ, "range_entiretext"(Tuta teksto)
+    <b>entrySearch</b>: "match_prefix",(antaŭkongrua) aŭ, "match_partial"(partkongrua),
+                  "match_complete"(tutkongrua)
+    <b>entiretext_wordSearch</b>: false, aŭ, true (Vortserĉado en la tuta teksto)
+    //display options (Montraj opcioj)
+    <b>showAfterSearch</b>: true, aŭ, false (Montri enhavojn post serĉo)
+    <b>retain</b>: false, aŭ true (Teni la montritaĵojn)
+    <b>usePool</b>: false, aŭ true (Uzi la Akumulejon)
+    <b>howDisplayDefs</b>: "prepend"(almeti supre),	aŭ "append"(almeti malsupre),
+                 "showone" (montri nur la elektita)
+    <b>maxDefs</b>: 100 (maksimuma nombro de montritaĵoj)
+};
+</pre>
+
+<hr>
+Vi povas libere elŝuti kaj uzi la softvaron <i>Espvortaroj</i>n senpage se la celoj estas nekomercaj.<br>
+Ni transformos la formatojn de aliaj vortaroj por ebligi ilin uzi kun <i>Espvortaroj</i>, se la sekvantaj kondiĉoj plenumiĝas:<br>
+&nbsp; 1. La vortaro devas esti publika kaj senpaga.<br>
+&nbsp; 2. Ne troviĝas neniuj problemoj kun aŭtorrajto, licenco, ktp.<br>
+&nbsp; 3. La vortaro devas rilati al Esperanto.<br>
+(Ni donos konsilojn eĉ en aliaj kondiĉoj se ni trovis neceson.)<br>
+Kontaktu <img src="sistem_img/Email-address.gif">.<br>
+La retpaĝo: <a href="http://esperanto.mond.jp/eo/index.html">esperanto.mond.jp (Verda Monteto)</a><br>
+(2014-07-16)<br>
+</body>
+</html>
+
