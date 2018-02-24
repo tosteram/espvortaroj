@@ -9,23 +9,24 @@
 	h2 {font-size:13pt; border-bottom:1px dashed grey; padding-bottom:1px;}
 	h3 {font-size:12pt; padding-bottom:1px;}
 	.faint {color:grey; font-size:smaller;}
+	.dict_n {border:solid 1px grey; padding:0px 2px; margin-left:5px; color:black;}
 </style>
 </head>
 
 <body style="max-width:190mm; margin-left:3mm; line-height:1.3em; font-family:sans-serif; font-size:12pt; color:#404040;">
 <h1>エスペラント辞書ソフト(Espvortaroj)の設定</h1>
-<div style="text-align:right;">(v1.0 2014-07-16)</div>
+<div style="text-align:right;"><b>v2.0</b> (2014-08-01)</div>
 
 js/init.js, 辞書ファイル、言語ファイルの設定・フォーマットについて解説します。<br>
 なお、ファイルはすべて <u><b>UTF-8</b> 文字セット</u>で作成してください。
 
 <h2 id="dict_settings">1. 辞書の設定</h2>
-js/init.jsの変数 <b>dictionaries</b> に、辞書選択ダイアログに表示する辞書を定義します。
-var dictionariesの各辞書定義項目は、次のようになります:<br>
+js/init.jsの変数 var <b>dictionaries</b> に、辞書選択ダイアログに表示する辞書を定義します。
+dictionariesの各辞書定義項目は、次のようになります:<br>
 <pre>
     <i>NAME_ID</i>: {
         name:"○○○○", edition:"△△△△",
-        dict_js:"□□□.js", text:"xxx",
+        dict_js:"□□□.js", text:"xxx", color:"***",
         dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
         },
 </pre>
@@ -33,7 +34,11 @@ var dictionariesの各辞書定義項目は、次のようになります:<br>
 <b>name</b> : 表示名称<br>
 <b>edition</b> : 編者名、バーションなど<br>
 <b>dict_js</b> : 辞書ファイル名。(下記 <a href="#dict_file">3. 辞書ファイル</a>参照)<br>
-<b>text</b> : 辞書テキストのタイプ: plain または html  (ただし、現在plainのみ)<br>
+<b>text</b> : 辞書テキストのタイプ: plain または html 
+(現在プログラム内部では使っていません。htmlの場合、<a href="#dict_funcs">makeDef函数</a>に定義済のmakeDef_htmlを指定してください。)<br>
+<b>color</b> : 辞書の背景色。CSSで使う色形式
+[例: "silver" 色名、"#rrggbb" 16進数RGB、"rgb(r,g,b)" 10進数/% RGB]
+(v2.0以降。未定義のときは、<a href="#colors">お任せ色</a>になります)<br>
 <b>dict, conv1, conv2, makeEntry, makeDef</b> : 辞書データと函数。
 後述の<a href="#dict_funcs">辞書定義</a>参照。ここでは、すべてnullに設定します。<br>
 <br>
@@ -41,9 +46,11 @@ var dictionariesの各辞書定義項目は、次のようになります:<br>
 「辞書の選択」ダイアログで選択した辞書のみメモリーに読み込まれます。<br>
 
 <h2 id="default_dict">2. 起動時の辞書</h2>
-js/init.jsの変数 <b>defaultDict</b> に上記辞書定義にある "<i>NAME_ID</i>" (ダブルクォートで囲む) を設定すると、
+js/init.jsの変数 <b>defaultDicts</b> に上記辞書定義にある "<i>NAME_ID</i>"
+(ダブルクォートで囲む) を設定する
+<span class="faint">([...]の中に書く; 複数個なら コンマ , で区切る)</span>と、
 その辞書が起動時に読み込まれ、検索対象の辞書となります。<br>
-defaultDict=null の場合は、起動後、辞書選択ダイアログが表示されます。<br>
+defaultDicts=[] の場合は、起動後、辞書選択ダイアログが表示されます。<br>
 
 <h2 id="dict_file">3. 辞書ファイル</h2>
 辞書ファイルは"vortaroj"フォルダに置きます。「<a href="#dict_settings">1.辞書の設定</a>」の dict_js: にそのファイル名が指定されます。<br>
@@ -66,11 +73,14 @@ var <i>DICT_DATA</i> = [
 「内容」の次の文字は変換しておいてください:<br>
 \ (バックスラッシュ、円記号) → \\<br>
 " (クォート) → \" <br>
-<!--
+HTMLテキストの場合は次の文字も変換が必要です:<br>
 &amp; → &amp;amp;<br>
 &lt; → &amp;lt;<br>
 &gt; → &amp;lgt<br>
--->
+<span class="faint">* 改行は \n ですが、既定では改行表示されません。
+改行表示したい場合は、text:plain の場合、<a href="#dict_funcs">makeDef函数</a>を自作するか、またはHTML形式にフォーマット変換して(改行を&lt;br&gt;に変換、その他 &amp; &lt; &gt; も変換)、makeDef_htmlを使ってください。</span><br>
+
+<br>
 「その他のデーター」としては、例えば、語の分類や付属画像などがあるでしょう。
 これらは、次節の makeDef 函数で表示されることになるでしょう<br>
 
@@ -102,13 +112,14 @@ var <i>FUNCS</i> = {
 	引数は、辞書データーの"内配列一個"。<br>
 	返す値は、HTMLの&lt;div&gt;エレメントです(ここに表示される内容を設定します)。</li>
 </ul>
-注1: 主な変換函数は、js/regilo.jsに定義されていますので、これを使ってください。
+[注1] 主な変換函数は、js/regilo.jsに定義されていますので、これを使ってください。
 	特殊な変換は、自分で作成する必要があります。<br>
 	* chapeligu(s)  : X記法から変換<br>
 	* romajiToHiragana(s) : ローマ字入力をひらがなに変換<br>
 	* longToVowel(s) : 長音記号を母音に変換<br>
+	* makeDef_html(entry) : HTMLの辞書内容を表示する<br>
 <br>
-注2: これら函数に null を設定すると、下記の既定の函数が呼ばれます:<br>
+[注2] これら函数に null を設定すると、下記の既定の函数が呼ばれます:<br>
 <ul>
 	<li>conv1_default : chapeligu(s)</li>
 	<li>conv2_default : chapeligu(s)</li>
@@ -157,26 +168,72 @@ var defaultOpts= {
     <b>entrySearch</b>: "match_prefix" (前方一致) または,
                   "match_partial" (部分一致), "match_complete" (完全一致)
     <b>entiretext_wordSearch</b>: false, または, true (全文・単語検索)
+
     //display options (表示オプション)
     <b>showAfterSearch</b>: true, または, false (検索後内容表示)
     <b>retain</b>: false, または true (内容保持)
     <b>usePool</b>: false, または true (収納箱を使う)
+    <b>colorize</b>: false, または true (辞書別色分け)
     <b>howDisplayDefs</b>: "prepend"(上に追記), または
                   "append"(下に追記), "showone"(選択語のみ表示)
     <b>maxDefs</b>: 100 (最大表示個数)
+
+    //others
+    <b>font_family</b>: "Tahoma, Times New Roman, sans-serif" (フォント指定)
+    <b>font_size</b>: "12pt"  (フォント・サイズ)
+    <b>list_width</b>:150     (見出し語リストの幅[px])
+    <b>sort</b>: "sort_esp" または "sort_none", "sort_local"  (ソート方法)
+    <b>use_cookie</b>: false または true                    ((現在未使用))
 };
 </pre>
 
-<hr>
-エスペラント辞書ソフト"Espvortaroj"は、非商業的利用に限り自由にダウンロードして使用できます。<br>
-その他の辞書も、以下の条件でEspvortarojで使えるように、フォーマット変換致します。<br>
+<h2 id="colors">6. お任せの辞書色</h2>
+
+var <a href="#dict_settings">dictionaries</a>に color: 定義がないと、
+辞書の並びの順に以下の色が使われます。<br>
+CSSで使うデータ形式で色を指定します。
+[例: "silver" 色名称、"#RRGGBB" 16進数RGB、"rgb(R,G,B)" 10進数または% RGB]<br>
+<br>
+var bgcolors= [<br>
+&nbsp; 
+	<span class="dict_n" style="background-color:#F5FFB1">1</span>
+	<span class="dict_n" style="background-color:#D8FFB1">2</span>
+	<span class="dict_n" style="background-color:#BAFFB1">3</span>
+	<span class="dict_n" style="background-color:#B1FFC4">4</span>
+	<span class="dict_n" style="background-color:#CDFEEC">5</span>
+	<span class="dict_n" style="background-color:#C1D4FF">6</span>
+	<span class="dict_n" style="background-color:#E6CDFE">7</span>
+	<span class="dict_n" style="background-color:#FFF1E9">8</span>
+	<span class="dict_n" style="background-color:#F8FECD">9</span>
+	<span class="dict_n" style="background-color:#FCE9FF">10</span><br>
+&nbsp; 
+	<span class="dict_n" style="background-color:#E6E6E6">11</span>
+	<span class="dict_n" style="background-color:#E8FABE">12</span>
+	<span class="dict_n" style="background-color:#FAF4DB">13</span>
+	<span class="dict_n" style="background-color:#DAF5EE">14</span>
+	<span class="dict_n" style="background-color:#DFDAF5">15</span>
+	<span class="dict_n" style="background-color:#F6E9F4">16</span>
+	<span class="dict_n" style="background-color:#F3F6E9">17</span>
+	<span class="dict_n" style="background-color:#DDFFE3">18</span>
+	<span class="dict_n" style="background-color:#FAFFDD">19</span>
+	<span class="dict_n" style="background-color:#FFEDDD">20</span><br>
+];<br>
+<br>
+
+<h2 id="about">Espvortaroj について</h2>
+※ エスペラント辞書検索ソフト"Espvortaroj"は、非商業的利用に限り自由にダウンロードして
+使用できます (商用利用の場合は、連絡をください)。<br>
+※ 辞書データについては、各辞書の使用許諾(ライセンス)に従ってください。
+有料の辞書もあり得ます。<br>
+※ 以下の条件ならEspvortarojで使えるように、無料でフォーマット変換致します。<br>
 &nbsp; 1. 原則的に公開とし、無料で使用できる<br>
 &nbsp; 2. 著作権、ライセンス等に問題がないこと<br>
 &nbsp; 3. エスペラントの辞書<br>
 (これ以外の条件でも、場合によっては助言等のサポート致します。)<br>
-不具合報告、お問い合わせ、ご意見、ご要望などは <img src="sistem_img/Email-address.gif">へどうぞ。<br>
-ホーム・ページ <a href="http://esperanto.mond.jp/index.html">(Verda Monteto)</a><br>
-(2014-07-16)<br>
+※ <a href="history_ja.html">改訂履歴</a><br>
+※ 不具合報告、お問い合わせ、ご意見、ご要望などは <img src="sistem_img/Email-address.gif">へどうぞ。<br>
+※ ホーム・ページ <a href="http://esperanto.mond.jp/index.html#espvortaroj">(Verda Monteto)</a><br>
+(2014-08-01)<br>
 </body>
 </html>
 

@@ -1,4 +1,4 @@
-// 2014-07-05
+// 2014-07-05; 07-30
 // lingvo: esperanto
 
 // id
@@ -6,16 +6,21 @@ var lang_href_help= "help_eo.html";	//href
 var lang_button= {
 	btn_search:"Serĉu",
 	btn_delete:"Forigu tuton",
-	btn_select:"Akumulu tuton",
+	btn_toPool:"Akumulu tuton",
 	btn_emptyPool:"Malplenigu",
 };
 var lang_lbl= {
 	// id
-	dict_name: "Esperanta vortaro",
+	dict_name: "Vortaroj",
 
 	search_range: "Celzono",
 	lbl_entries: "Kapvortoj",
 	lbl_entiretext: "Tuta teksto",
+
+	title_opts:"Opcioj",
+	tab1:"Serĉado",
+	tab2:"Montrado",
+	tab3:"Aliaj",
 
 	schopts_entry:	"Kapvortoj",
 	schopts_prefix: "Komenciĝantaj kun eniga signovico",	// Antaŭa-kongruaj
@@ -24,16 +29,22 @@ var lang_lbl= {
 	schopts_entiretext: "Tuta teksto",
 	schopts_word2: "Kongruaj vortoj",
 
-	lbl_results: "Rezultaro",
+	lbl_results: "Kapvortoj",
 
-	lbl_showdefs: "Montru post serĉo",
-	lbl_retain: "Tenu montritaĵojn",
-	lbl_usePool: "Uzu Akumulejon",
+	lbl_showdefs: "Montri post serĉo",
+	lbl_retain: "Teni montritaĵojn",
+	lbl_usePool: "Uzi Akumulejon",
+	lbl_colorize: "Kolorigi laŭ vortaro",
 	lbl_sel_entry: "Elektita kapvorto",
-	lbl_prepend: "Almetu ĝin supre",
-	lbl_append: "Almetu ĝin malsupre",
-	lbl_showone: "Montru nur ĝin",
+	lbl_prepend: "Almeti ĝin supre",
+	lbl_append: "Almeti ĝin malsupre",
+	lbl_showone: "Montri nur ĝin",
 	lbl_maxdefs: "Maksimuma nombro",
+
+	lbl_sort:"Ordigo post kapvorto-serĉado en pluraj vortaroj",
+	lbl_sortnone:"Ne ordigi",
+	lbl_sortesp:"Laŭ esperanta alfabeto",
+	lbl_sortlocal:"Laŭ loka ordo",
 
 	lbl_pool:"Akumulejo",
 
@@ -42,19 +53,20 @@ var lang_lbl= {
 };
 
 var lang_str= {
-	dict_target: "Cela vortaro",
+	dict_target: "Celaj vortaroj",
 	dict_load: "Ŝarĝitaj/malŝarĝitaj vortaroj↓",
 	ok:"Bone",
-	cancel:"Nuligu",
-	entries:"Kapvortoj",
-	msg_selectDict:"Elektu la celan vortaron",
-	msg_loadDict:"Ŝarĝu la celan vortaron.",
+	cancel:"Rezigni",
+	hit1:" Kapvorto",
+	hit2:" Kapvortoj",
+	msg_selectDict:"Elektu celajn vortarojn",
+	msg_loadDict:"Ŝarĝu celajn vortarojn.",
 };
 
 // tips
 var lang_tips= {
 	"help": "Helpo",
-	"select_dicts": "Elektu la celan vortaron",
+	"select_dicts": "Elektu la celajn vortarojn",
 	"searchHistory": "Serĉhistorio",
 	"clear_search_str": "Forviŝu",
 	"show_search_opts": "Serĉaj opcioj",

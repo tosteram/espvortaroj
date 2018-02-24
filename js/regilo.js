@@ -1,11 +1,12 @@
 /* Elektronikaj Esperantaj Vortaroj kun retumilo
 File	regilo.js
-Date	2014-07-09
-Espvortaroj version 1.0
+Date:
+2014-07-09	Espvortaroj version 1.0
+2014-07-31	version 2.0
 
 Copyright (C) 2014, Tositaka TERAMOTO & FUKUMOTO Hirotsugu.
 Permission to use, copy, modify, and distribute this software and 
-its documentation for any non-commercial purpose is hereby granted 
+its documentation for any purpose (including commercial use) is hereby granted 
 without fee, provided that the above copyright notice appear in all 
 copies and that both that copyright notice and this permission 
 notice appear in supporting documentation.
@@ -19,20 +20,14 @@ var IMG_add="sistem_img/Add.gif";
 var IMG_remove="sistem_img/Remove.gif";
 var IMG_open="sistem_img/Open.gif";
 var IMG_closed="sistem_img/Closed.gif";
+var IMG_book="sistem_img/Book.gif";
+var IMG_books="sistem_img/Books.gif";
 
-
-//--- Dictionary specific vars ---
-var currentDict= "";
-var requestedDict= "";
-var Dict= null;
-var convSchstr1= null;
-var convSchstr2= null;
-var makeEntry= null;
-var makeDef= null;
-
-var o_dicts= [];	//[[dict.name, chk.elem, img.elem], ...]
+//--- ---
+var o_dicts= {};
+	//{name: {chk:chk.elem, img:img.elem, sel:selected, laden:_, color:_}, ...}
 var searchHistory= [];
-
+var o_compstr= null;
 //
 window.onload= function() {
 	//language
@@ -60,6 +55,14 @@ window.onload= function() {
 	//callback_lang() will be called when load completed.
 
 	//default options
+	document.body.style.fontFamily= defaultOpts["font_family"];
+	document.body.style.fontSize= defaultOpts["font_size"];
+	
+	var list_width= defaultOpts["list_width"];
+	document.getElementById("results").style.width= list_width+"px";
+	document.getElementById("v_sash").style.left= (list_width+5)+'px';
+	document.getElementById("defpane").style.left= (list_width+10)+"px";
+
 	var elem= document.getElementById(defaultOpts["searchRange"]);
 	if (elem)
 		elem.checked= true;
@@ -71,17 +74,26 @@ window.onload= function() {
 	document.getElementById("showdefs").checked= defaultOpts["showAfterSearch"];
 	document.getElementById("retain").checked= defaultOpts["retain"];
 	document.getElementById("usePool").checked= defaultOpts["usePool"];
-	document.getElementById("btn_select").style.display= (defaultOpts["usePool"])?"inline":"none";
+	document.getElementById("chk_colorize").checked= defaultOpts["colorize"];
+	document.getElementById("btn_toPool").style.display= (defaultOpts["usePool"])?"inline":"none";
 	elem= document.getElementById(defaultOpts["howDisplayDefs"]);
 	if (elem)
 		elem.checked= true;
 	document.getElementById("maxdefs").value= defaultOpts["maxDefs"];
+	elem= document.getElementById(defaultOpts["sort"]);
+	if (elem) {
+		elem.checked= true;
+	}
 
 	//event handlers
 	addEventHandler(document.getElementById("searchstr"), "keydown", inputSearchStr);
 	addEventHandler(document.getElementById("selectSchHistory"), "keydown", schHistoryKeyPress);
 	addEventHandler(document.getElementById("results"), "click", onShowDef);
 	addEventHandler(document.getElementById("defs"), "click", onDefClicked);
+
+	elem= document.getElementById("dict_name");
+	addEventHandler(elem, "mouseover", showDictName);
+	addEventHandler(elem, "mouseout", hideTip);
 
 	var imgs=document.getElementsByTagName("img");
 	for (var i=0; i<imgs.length; ++i) {
@@ -90,6 +102,8 @@ window.onload= function() {
 			addEventHandler(imgs[i], "mouseout", hideTip);
 		}
 	}
+	
+	initDragDrop();
 
 	// make SelDictsDialog and load dictionaries after having read the language js
 	// in callback_lang()
@@ -115,14 +129,24 @@ function callback_lang() {
 			elem.appendChild(document.createTextNode(lang_lbl[key]));
 	}
 
-	// load the default dictionary or show dialog
+	// Dictionary dialog
 	makeSelDictsDialog();
-	if (defaultDict) {
-		requestedDict= defaultDict;
-		loadDict(defaultDict);
+
+	// load the default dictionaries or show dialog
+	if (defaultDicts.length>0) {
+		var i;
+		// set selected
+		for (i=0; i<defaultDicts.length; ++i) {
+			o_dicts[defaultDicts[i]].sel= true;
+		}
+		initDictTitle(defaultDicts.length>1);
+		// load the dictionaries
+		for (i=0; i<defaultDicts.length; ++i) {
+			loadDict(defaultDicts[i]);
+		}
 	}
 	else {
-		selectDicts();
+		showSelDictsDialog(true);
 	}
 }
 
@@ -132,10 +156,13 @@ function makeSelDictsDialog() {
 	
 	//app version
 	var elem=document.createElement("div");
+	elem.className="titlebar";
+	elem.appendChild(document.createTextNode("Espvortaroj "+version));
+	frag.appendChild(elem);
+
+	elem=document.createElement("div");
 	elem.style.textAlign="right";
 	elem.style.color="grey";
-	elem.appendChild(document.createTextNode("Espvortaroj "+version));
-	elem.appendChild(document.createElement("br"));
 	elem.appendChild(document.createTextNode(lang_str["dict_load"]));
 	frag.appendChild(elem);
 
@@ -145,9 +172,11 @@ function makeSelDictsDialog() {
 	frag.appendChild(elem);
 
 	//
+	var n=0;
 	var name;
 	for (name in dictionaries) {
-		var d= dictionaries[name];
+		++n;
+		var D= dictionaries[name];
 
 		// <div> <img-right> <label><radiobutton>dic.name<br>dic.ver</label> </div>
 		elem= document.createElement("div");
@@ -164,29 +193,34 @@ function makeSelDictsDialog() {
 		elem.appendChild(img);
 
 		var label= document.createElement("label");
-		var radio= document.createElement("input");
-		radio.type="radio";
-		radio.id= "chk_"+name;
-		radio.name= "chk_dict";
-		addEventHandler(radio, "click", onClickDict);
-		label.appendChild(radio);
+		var chkbox= document.createElement("input");
+		chkbox.type="checkbox";
+		chkbox.id= "chk_"+name;
+		chkbox.name= "chk_dict";
+		addEventHandler(chkbox, "click", onClickDict);
+		label.appendChild(chkbox);
 
-		label.appendChild(document.createTextNode(d["name"]));
+		label.appendChild(document.createTextNode(n+'. '+D["name"]));
 		label.appendChild(document.createElement("br"));
 		var span= document.createElement("span");
-		span.appendChild( document.createTextNode(d["edition"]) );
+		span.appendChild( document.createTextNode(D["edition"]) );
 		span.style.paddingLeft="20px";
 		label.appendChild(span);
 		elem.appendChild(label);
 
-		o_dicts.push([name, radio, img]);
+		var color= D.color;
+		if (!color)
+			color= bgcolors[n-1];
+
+		o_dicts[name]= {'idx':n, 'chk':chkbox, 'img':img, 'sel':false, 'laden':false,
+						'color':color};
 		frag.appendChild(elem);
 	}
 
 	frag.appendChild(document.createElement("hr"));
 	//buttons
 	var span= document.createElement("span");
-	span.innerHTML="&nbsp;&nbsp;<input type='button' value='"+lang_str["ok"]+"' onclick='selDictsOK()'>&nbsp;<input type='button' value='"+lang_str["cancel"]+"' onclick='selectDicts()'>";
+	span.innerHTML="&nbsp;&nbsp;<input type='button' value='"+lang_str["ok"]+"' onclick='selDictsOK()'>&nbsp;<input type='button' value='"+lang_str["cancel"]+"' onclick='showSelDictsDialog(false)'>";
 	span.style.marginLeft="50px;";
 	frag.appendChild(span);
 
@@ -201,60 +235,91 @@ function loadDict(dictName) {
 	document.body.appendChild(script);
 }
 function unloadDict(dictName) {
-	var d= dictionaries[dictName];
-	d["dict"]= null;
-	d["conv1"]= null;
-	d["conv2"]= null;
-	d["makeEntry"]=null;
-	d["makeDef"]= null;
+	var D= dictionaries[dictName];
+	D["dict"]= null;
+	D["conv1"]= null;
+	D["conv2"]= null;
+	D["makeEntry"]=null;
+	D["makeDef"]= null;
 	
+	o_dicts[dictName].laden= false;
+
 	var elem= document.getElementById("js_"+dictName);
-	if (dictName==currentDict) {
-		Dict= null;
-		convSchstr1= null;
-		convSchstr2= null;
-		makeEntry= null;
-		makeDef= null;
-	}
 	elem.parentNode.removeChild(elem);
 }
 
 // called when the dictionary has been loaded
 function callback(name, dict, funs) {
-	var d= dictionaries[name];
-	d["dict"]= dict;
-	d["conv1"]= funs["conv1"];
-	if (!d["conv1"])
-		d["conv1"]= conv1_default;
-	d["conv2"]= funs["conv2"];
-	if (!d["conv2"])
-		d["conv2"]= conv2_default;
-	d["makeEntry"]= funs["makeEntry"];
-	if (!d["makeEntry"])
-		d["makeEntry"]= makeEntry_default;
-	d["makeDef"]= funs["makeDef"];
-	if (!d["makeDef"])
-		d["makeDef"]= makeDef_default;
+	var D= dictionaries[name];
+	D["dict"]= dict;
+	D["conv1"]= funs["conv1"];
+	if (!D["conv1"])
+		D["conv1"]= conv1_default;
+	D["conv2"]= funs["conv2"];
+	if (!D["conv2"])
+		D["conv2"]= conv2_default;
+	D["makeEntry"]= funs["makeEntry"];
+	if (!D["makeEntry"])
+		D["makeEntry"]= makeEntry_default;
+	D["makeDef"]= funs["makeDef"];
+	if (!D["makeDef"])
+		D["makeDef"]= makeDef_default;
 
-	if (name==requestedDict) {
-		setCurrentDict(name);
-	}
+	o_dicts[name].laden= true;
+	if (o_dicts[name].sel)
+		showDictTitle(name);
 }
 
-function setCurrentDict(name) {
-	currentDict= name;
-	requestedDict= "";
-	var d= dictionaries[name];
-	Dict= d["dict"];
-	convSchstr1= d["conv1"];
-	convSchstr2= d["conv2"];
-	makeEntry= d["makeEntry"];
-	makeDef= d["makeDef"];
-
-	var elem= document.getElementById("dict_name");
-	elem.replaceChild(
-		document.createTextNode(d["name"]),
-		elem.firstChild);
+function initDictTitle(multi) {
+	//img select_dicts, span dict_name
+	var img= document.getElementById("select_dicts");
+	var title= document.getElementById("dict_name");
+	title.innerHTML= "";
+	title.appendChild(document.createTextNode(lang_lbl.dict_name));
+	if (multi) {
+		img.src= IMG_books;
+		var frag= document.createDocumentFragment();
+		var id;
+		for (id in o_dicts) {
+			var d= o_dicts[id];
+			if (d.sel) {
+				var e= document.createElement("span");
+				e.className="dict_n";
+				e.setAttribute('params', id);
+				e.innerHTML= d.idx;
+				frag.appendChild(e);
+			}
+			title.appendChild(frag);
+		}
+	}
+	else {
+		img.src= IMG_book;
+	}
+}
+function showDictTitle(name) {
+	var img= document.getElementById("select_dicts");
+	var title= document.getElementById("dict_name");
+	if (img.src.indexOf(IMG_book)>=0) {
+		//single
+		title.replaceChild(
+			document.createTextNode(dictionaries[name].name),
+			title.firstChild);
+	}
+	else {
+		//multiple
+		var ch= title.firstChild;
+		while (ch) {
+			if (ch.nodeType==1) {	//element?
+				var p= ch.getAttribute('params');
+				if (p && p==name) {
+					ch.style.color='black';
+					ch.style.backgroundColor= o_dicts[name].color;
+					return;
+				}
+			}
+			ch= ch.nextSibling;
+		}
+	}
 }
 
 function inputSearchStr(e) {
@@ -309,8 +374,10 @@ function addToStack(stack, item, max) {
 }
 
 function search() {
-	if (!Dict) {
-		selectDicts();
+	
+	var selectedDicts= getSelectedDicts();
+	if (selectedDicts.length==0) {
+		showSelDictsDialog(true);
 		showMessageBox(lang_str["msg_selectDict"]);
 		return;
 	}
@@ -347,77 +414,145 @@ function search() {
 	var frag_res= document.createDocumentFragment();
 	var frag_def= document.createDocumentFragment();
 
-	// Title of the list
-	var div= entryListHead(lang_str["entries"], "k");
-	frag_res.appendChild(div);
-
 	// start searching
 	var entiretext= document.getElementById("range_entiretext").checked;
 	if (entiretext)
-		search_alltext(schstr, frag_res, frag_def, maxdefs);
+		search_alltext(selectedDicts, schstr, frag_res, frag_def, maxdefs);
 	else
-		search_entries(schstr, frag_res, frag_def, maxdefs);
+		search_entries(selectedDicts, schstr, frag_res, frag_def, maxdefs);
 
+	// Title of the list
+	var hits= frag_res.childNodes.length;
+	hits= (hits==1)? (hits+lang_str["hit1"]) : (hits+lang_str["hit2"]);
+	var div= entryListHead(hits, "k");
+
+	// show all
+	results.appendChild(div);
 	results.appendChild(frag_res);
 	defpane.appendChild(frag_def);
 
 	document.getElementById("searchstr").focus();
 }
 
-function search_entries(schstr, frag, frag_def, maxdefs) {
-	schstr= convSchstr1(schstr);
-	var re;
-	var schAllEntries= false;
-	if (document.getElementById("match_prefix").checked)
-		re= new RegExp("^"+schstr, "i");
-	else if (document.getElementById("match_complete").checked)
-		re= new RegExp("^"+schstr+"$", "i");
-	else {
-		re= new RegExp(schstr, "i");
-		schAllEntries= true;
+function getSelectedDicts() {
+	var select=[];
+	var name;
+	for (name in o_dicts) {
+		var d=o_dicts[name];
+		if (d.sel && d.laden)
+			select.push(name);
 	}
-	var matched= false;
-	var count=0;
-	for (var i=0; i<Dict.length; ++i) {
-		var entry= Dict[i];
-		if (re.test(entry[0])) {
-			var div= makeEntry(entry, currentDict+" "+i, "r");
-			frag.appendChild(div);
-			matched=true;
-			++count;
-			if (count<=maxdefs) {
-				frag_def.appendChild(makeDefWButton(entry, IMG_add, currentDict));
-			}
+	return select;
+}
+
+function search_entries(dicts, schstr, frag_ent, frag_def, maxdefs) {
+	var colorize= document.getElementById("chk_colorize").checked;
+	var arr=[];
+	var n;
+	for (n=0; n<dicts.length; ++n) {
+		var name= dicts[n];
+		var D= dictionaries[name];
+		var Dict= D.dict;
+		var color= o_dicts[name].color;
+
+		var str= D.conv1(schstr);
+		var re;
+		var schAllEntries= false;
+		if (document.getElementById("match_prefix").checked)
+			re= new RegExp("^"+str, "i");
+		else if (document.getElementById("match_complete").checked)
+			re= new RegExp("^"+str+"$", "i");
+		else {
+			re= new RegExp(str, "i");
+			schAllEntries= true;
 		}
-		else if (matched && !schAllEntries) {
-			break;
+
+		var matched= false;
+		for (var i=0; i<Dict.length; ++i) {
+			var entry= Dict[i];
+			if (re.test(entry[0])) {
+				var div= D.makeEntry(entry, name+" "+i, "r");
+				if (colorize)
+					div.style.backgroundColor= color;
+				arr.push(div);
+				matched=true;
+			}
+			else if (matched && !schAllEntries) {
+				break;
+			}
+		} //end. for a dict
+	} //end. for dicts
+
+	if (dicts.length>1) {
+		o_compstr=
+			(document.getElementById("sort_esp").checked)?
+					compEspStr :
+			(document.getElementById("sort_local").checked)?
+					function(s1,s2){return s1.localeCompare(s2);} : 
+					null;
+		if (o_compstr)
+			arr.sort(compWords);
+	}
+
+	var count=0;
+	for (n=0; n<arr.length; ++n) {
+		var attr= arr[n].getAttribute("params");
+		var params= attr.split(' ');
+		var name= params[0];
+		var idx= parseInt(params[1]);
+		var D= dictionaries[name];
+		//
+		frag_ent.appendChild(arr[n]);
+
+		var entry= D.dict[idx];
+		++count;
+		if (count<=maxdefs) {
+			var div= makeDefWButton(D.makeDef, entry, IMG_add, name);
+			if (colorize)
+				div.style.backgroundColor= o_dicts[name].color;
+			frag_def.appendChild(div);
 		}
 	}
 }
 
-function search_alltext(schstr, frag, frag_def, maxdefs) {
-	schstr= convSchstr2(schstr);
-	var re;
-	if (document.getElementById("match_word_entiretext").checked //)
-			&& isAllAlphabet(schstr)) {
-		re= new RegExp("\\b"+schstr+"\\b", "i");
-	}
-	else {
-		re= new RegExp(schstr, "i");
-	}
-	var count=0;
-	for (var i=0; i<Dict.length; ++i) {
-		var entry= Dict[i];
-		if (re.test(entry[0]) ||
-			re.test(entry[1]) ||
-			re.test(entry[2])
-			) {
-			//
-			var div= makeEntry(entry, currentDict+" "+i, "r");
-			frag.appendChild(div);
-			++count;
-			if (count<=maxdefs) {
-				frag_def.appendChild(makeDefWButton(entry, IMG_add, currentDict));
+function search_alltext(dicts, schstr, frag_ent, frag_def, maxdefs) {
+	var colorize= document.getElementById("chk_colorize").checked;
+	var n;
+	for (n=0; n<dicts.length; ++n) {
+		var name= dicts[n];
+		var D= dictionaries[name];
+		var Dict= D.dict;
+		var color= o_dicts[name].color;
+
+		var str= D.conv2(schstr);
+		var re;
+		if (document.getElementById("match_word_entiretext").checked //)
+				&& isAllAlphabet(str)) {
+			re= new RegExp("\\b"+str+"\\b", "i");
+		}
+		else {
+			re= new RegExp(str, "i");
+		}
+
+		var count=0;
+		for (var i=0; i<Dict.length; ++i) {
+			var entry= Dict[i];
+			if (re.test(entry[0]) ||
+				re.test(entry[1]) ||
+				re.test(entry[2])
+				) {
+				//
+				var div= D.makeEntry(entry, name+" "+i, "r");
+				if (colorize)
+					div.style.backgroundColor= color;
+				frag_ent.appendChild(div);
+				++count;
+				if (count<=maxdefs) {
+					var div= makeDefWButton(D.makeDef, entry, IMG_add, name);
+					if (colorize)
+						div.style.backgroundColor= o_dicts[name].color;
+					frag_def.appendChild(div);
+				}
 			}
 		}
 	}
@@ -434,6 +569,40 @@ function isAllAlphabet(str) {
 //	return /^[a-z ĉĝĥĵŝŭ]+$/.test(str);
 }
 
+function compWords(div1, div2) {
+	var s1= getText(div1).toLowerCase();
+	var s2= getText(div2).toLowerCase();
+	return o_compstr(s1, s2);
+}
+function compEspStr(s1,s2) {
+	var table={	'ĉ':'cx', 'ĝ':'gx', 'ĥ':'hx', 'ĵ':'jx', 'ŝ':'sx', 'ŭ':'ux'};
+	for (var i=0; ;++i) {
+		var s1end= i>=s1.length;
+		var s2end= i>=s2.length;
+		if (s1end && s2end)
+			return 0;
+		else if (s1end)
+			return -1;
+		else if (s2end)
+			return 1;
+		else {
+			var c1= s1.charAt(i);
+			var c2= s2.charAt(i);
+			if (table[c1])
+				c1= table[c1];
+			if (table[c2])
+				c2= table[c2];
+			if (c1<c2)
+				return -1;
+			else if (c1>c2)
+				return 1;
+		}
+	}
+}
+
+//---------------------------
+// POOL
+//---------------------------
 function getPool(show) {
 	var pool= document.getElementById("pool");
 	var content= document.getElementById("poolContent");
@@ -680,24 +849,60 @@ var makeDef_default= function(entry) {
 	return div;
 }
 
-function makeDefWButton(entry, button, dict) {
+var makeDef_html= function(entry) {
+	var div=document.createElement("div");
+	div.style.borderTop="dashed 1px lightgrey";
+	div.style.paddingTop="2px";
+	var h=document.createElement("span");
+	h.innerHTML= "<b>"+((entry[1])? entry[1]:entry[0])+"</b>&nbsp; &nbsp; ";
+	div.innerHTML= entry[2];
+	div.insertBefore(h, div.firstChild);
+	return div;
+}
+
+function makeDefWButton(makeDef, entry, button, dict) {
 	var div= makeDef(entry);
 	div.setAttribute("params", dict);
 	var img= document.createElement("img");
 	img.src= button;
-	img.className="btn";
+	img.className="xbtn";
 	div.insertBefore(img, div.firstChild);
 	return div;
 }
 
-function getText(elem) {
-	var ch=elem.firstChild;
+function colorize(on) {
+	var list= document.getElementById("results");
+	var pool= document.getElementById("poolContent");
+	var defs= document.getElementById("defs");
+	colorizeEach(list, pool, defs, (on)? getColor : function(ch){return '';})
+}
+function colorizeEach(list, pool, defs, color) {
+	var ch= list.firstChild;
 	while (ch) {
-		if (ch.nodeType==3)
-			return ch.nodeValue;
-		ch=ch.nextSibling;
+		if (ch.nodeName=='DIV' && ch.className=='r') {
+			ch.style.backgroundColor= color(ch);
+		}
+		ch= ch.nextSibling;
 	}
-	return "";
+	ch= pool.firstChild;
+	while (ch) {
+		if (ch.nodeName=='DIV') {
+			ch.style.backgroundColor= color(ch);
+		}
+		ch= ch.nextSibling;
+	}
+	ch= defs.firstChild;
+	while (ch) {
+		if (ch.nodeName=='DIV' && !ch.id) {
+			ch.style.backgroundColor= color(ch);
+		}
+		ch= ch.nextSibling;
+	}
+}
+function getColor(div) {
+	var attr= div.getAttribute('params');
+	var params= attr.split(' ');
+	return o_dicts[params[0]].color;
 }
 
 // Add to definition list, when the entry word is clicked
@@ -707,12 +912,13 @@ function onShowDef(evt) {
 		target= window.event.srcElement;
 	else
 		target= evt.target;
-	var params= target.getAttribute("params");
-	if (!params)
+	var attr= target.getAttribute("params");
+	if (!attr)
 		return;		//this is the head
-	var re= new RegExp("([^ ]+) (\\d+)");
-	var dict= params.replace(re, "$1");
-	var index= parseInt(params.replace(re, "$2"));
+
+	var params= attr.split(' ');
+	var dict= params[0];
+	var index= parseInt(params[1]);
 
 	var maxdefs= parseInt(document.getElementById("maxdefs").value);
 	if (!maxdefs)
@@ -722,7 +928,13 @@ function onShowDef(evt) {
 
 	var defpane= document.getElementById("defs");
 
-	var div=makeDefWButton(Dict[index], IMG_add, dict);
+	var D= dictionaries[dict];
+	var Dict= D.dict;
+	//
+	var div=makeDefWButton(D.makeDef, Dict[index], IMG_add, dict);
+	if (document.getElementById("chk_colorize").checked) {
+		div.style.backgroundColor= o_dicts[dict].color;
+	}
 	if (onlyone) {
 		deleteAllDefs(defpane);
 		defpane.appendChild(div);
@@ -757,7 +969,7 @@ function onDefClicked(evt) {
 	else
 		target= evt.target;
 
-	if (target.className=="btn") {
+	if (target.className=="xbtn") {
 		var elem= target.parentNode;
 		if (document.getElementById("usePool").checked) {
 			if (target.src.indexOf(IMG_add)>=0) {			// (+)
@@ -767,21 +979,45 @@ function onDefClicked(evt) {
 				removeFromPool(elem);
 			}
 		}
-		else {
-			var dicID= elem.getAttribute("params");
-			var dicname= dictionaries[dicID]["name"];
-			;
-			var elem=document.getElementById("tip");
-			elem.style.left= (evt.clientX)+"px";
-			elem.style.top= (evt.clientY+20)+"px";
-			elem.innerHTML= dicname;
-			elem.style.display="inline";
-			;
-			setTimeout("document.getElementById('tip').style.display='none'", 1000);
-		}
+	}
+	else if (target.nodeName=='B') {
+		// tricky !
+		var dicID= target.parentNode.parentNode.getAttribute("params");
+		if (dicID)
+			showDictNameTip(dicID, evt, true);
 	}
 }
 
+function showDictNameTip(dicID, evt, erase) {
+	var dicname= dictionaries[dicID]["name"];
+
+	var elem=document.getElementById("tip");
+	elem.style.left= (evt.clientX+15)+"px";
+	elem.style.top= (evt.clientY)+"px";
+	elem.innerHTML= dicname;
+	elem.style.display="inline";
+
+	if (erase)
+		setTimeout("document.getElementById('tip').style.display='none'", 1500);
+}
+
+function showDictName(evt) {
+	var target;
+	if (window.event) {
+		evt= window.event;
+		target= evt.srcElement;
+	}
+	else
+		target= evt.target;
+
+	if (target.className=='dict_n') {
+		showDictNameTip(target.getAttribute('params'), evt, false);
+	}
+}
+
+//---------------------------
+// History
+//---------------------------
 // clicked on on [History] button
 function showSearchHistory() {
 	var sel= document.getElementById("selectSchHistory");
@@ -867,6 +1103,9 @@ function clearSearchStr() {
 	elem.focus();
 }
 
+//---------------------------
+// dictionary dialog
+//---------------------------
 function onClickDict(evt) {
 	var target;
 	if (window.event)
@@ -878,13 +1117,15 @@ function onClickDict(evt) {
 	var checked= target.checked;		//true
 
 	// update load/unload state
-	var img= document.getElementById("img_"+name);
-	img.src= (checked)? IMG_loaded : IMG_unloaded;
-
-	if (dictionaries[name]["dict"]) {
-		//already loaded
-		selDictsOK();
+	if (!o_dicts[name].laden) {
+		var img= document.getElementById("img_"+name);
+		img.src= (checked)? IMG_loaded : IMG_unloaded;
 	}
+
+//	if (dictionaries[name]["dict"]) {
+//		//already loaded
+//		selDictsOK();
+//	}
 }
 
 function onClickDictImg(evt) {
@@ -901,31 +1142,27 @@ function onClickDictImg(evt) {
 		target.src= IMG_unloaded;
 	}
 	else if (target.src.indexOf(IMG_unloaded)>=0
-		&& dictionaries[name]["dict"]) {
+		&& o_dicts[name].laden) {
 		target.src= IMG_loaded;
 	}
 }
 
 // show/hide the sel.dicts dialog
-function selectDicts() {
+function showSelDictsDialog(show) {
 	var elem= document.getElementById("seldicts");
-	if (elem.style.display=="none") {
+	if (show==undefined)
+		show= elem.style.display=="none";	//toggle
+	if (show) {
 		// SHOW
-		var i;
-		for (i=0; i<o_dicts.length; ++i) {
-			var chk= o_dicts[i];
-			var dict_name= chk[0];
+		var name;
+		for (name in o_dicts) {
+			var d= o_dicts[name];
 			// selected ?
-			if (dict_name==currentDict) {
-				chk[1].checked= true;
+			if (d.sel) {
+				d.chk.checked= true;
 			}
 			// loaded ?
-			if (dictionaries[dict_name]["dict"]) {
-				chk[2].src= IMG_loaded;
-			}
-			else {
-				chk[2].src= IMG_unloaded;
-			}
+			d.img.src= (d.laden)? IMG_loaded : IMG_unloaded;
 		}
 		
 		elem.style.display= "block";
@@ -937,41 +1174,43 @@ function selectDicts() {
 	}
 }
 function selDictsOK() {
-	var sel_name="";
-	var sel_loaded= false;
-	var i;
-	for (i=0; i<o_dicts.length; ++i) {
-		var chk= o_dicts[i];
-		var name= chk[0];
-		if (chk[1].checked) {
-			sel_name= name;
-			requestedDict= sel_name;
-			sel_loaded= chk[2].src.indexOf(IMG_loaded)>=0;
+	var select= [];
+	var name;
+	for (name in o_dicts) {
+		var d= o_dicts[name];
+		d.sel= d.chk.checked;
+		//selected
+		if (d.sel) {
+			select.push(name);
 		}
-		var d= dictionaries[name];
-		if (chk[1].checked && chk[2].src.indexOf(IMG_loaded)>=0 && !d["dict"])
-			loadDict(name);
-		else if (chk[2].src.indexOf(IMG_unloaded)>=0 && d["dict"])
+		//unload
+		if (d.img.src.indexOf(IMG_unloaded)>=0 && d.laden) {
 			unloadDict(name);
+		}
 	}
 
-	if (sel_name && !sel_loaded) {
-		showMessageBox(lang_str["msg_loadDict"]);
+	//initialize the title
+	initDictTitle(select.length>1);
+
+	// check to see if dictionaries selected
+	if (select.length==0) {
+		showMessageBox(lang_str["msg_selectDict"]);
 		return;
 	}
-
-	if (sel_name!=currentDict && sel_name) {
-		if (dictionaries[sel_name]["dict"]) {
-			setCurrentDict(sel_name);
+	
+	//load, show title
+	var i;
+	for (i=0; i<select.length; ++i) {
+		var name= select[i];
+		if (o_dicts[name].laden) {
+			showDictTitle(name);
 		}
-		//else {
-			// (wait for loading)
-			// now loading the dictionary; when completed, callback() is called
-			// followed by setCurrentDict()
-			// currentDict= "";
-		//}
+		else {
+			loadDict(name);
+		}
 	}
 
+	// hide the dialog
 	var elem= document.getElementById("seldicts");
 	elem.style.display= "none";
 
@@ -1013,6 +1252,33 @@ function deleteAll() {
 	document.getElementById("searchstr").focus();
 }
 
+
+function showOptionDialog(page) {
+	var pages=["searchOpts", "dispOpts", "otherOpts"];	//page ID
+
+	var dialog= document.getElementById("optionDialog");
+	if (page==0) {
+		dialog.style.display="none";
+		document.getElementById("searchstr").focus();
+	}
+	else {
+		var i;
+		for (i=1; i<=pages.length; ++i) {
+			var tab= document.getElementById("tab"+i);
+			var div= document.getElementById(pages[i-1]);
+			if (i==page) {
+				tab.style.color= "black";
+				div.style.display="block";
+			}
+			else {
+				tab.style.color= "grey";
+				div.style.display="none";
+			}
+		}
+		dialog.style.display="block";
+	}
+}
+
 function onShowDefSettings() {
 	var elem= document.getElementById("dispOpts");
 	if (elem.style.display=="none") {
@@ -1024,7 +1290,7 @@ function onShowDefSettings() {
 	}
 }
 function use_Pool(chkbox) {
-	var elem= document.getElementById("btn_select");
+	var elem= document.getElementById("btn_toPool");
 	elem.style.display= (chkbox.checked)? "inline":"none";
 }
 
@@ -1036,6 +1302,135 @@ function showSearchOpts() {
 	else {
 		elem.style.display="none";
 		document.getElementById("searchstr").focus();
+	}
+}
+
+// highlighted selection
+function getSel() {
+	var sel= (window.getSelection)? window.getSelection():document.selection;
+	return sel;
+}
+function getRange() {
+	var sel= getSel();
+	var rng= (sel.rangeCount>0)? sel.getRangeAt(0): sel.createRange();
+	return rng;
+}
+
+function getText(elem) {
+	var ch=elem.firstChild;
+	while (ch) {
+		if (ch.nodeType==3)
+			return ch.nodeValue;
+		ch=ch.nextSibling;
+	}
+	return "";
+}
+function getText_nest(elem) {
+	//NB: NodeIterator doesn't work for <A>, why?
+	var text= "";
+	var ch= elem.firstChild;
+	while (ch) {
+		if (ch.nodeType==3)			//text
+			text += ch.nodeValue;
+		else if (ch.nodeType==1)	//element
+			text += getText(ch);
+		ch= ch.nextSibling;
+	}
+	return text;
+}
+
+// dragging
+var dragging= null;
+function initDragDrop() {
+	document.onmousedown= onMouseDown;
+	document.onmouseup= onMouseUp;
+}
+function onMouseDown(evt) {
+	if (!evt)
+		evt= window.event;
+	var target= (evt.target)? evt.target : evt.srcElement;
+	//left click: IE=1, Firefox=0
+	//Mouse buttons
+	// Click->	L	M	R
+	// firefox	0	1	2
+	// IE		1	4	2
+	if (isIE() && evt.button==1 || evt.button==0) {
+		var className= target.className;
+		var elem, x, y;
+		if (className=='titlebar') {
+			target= target.parentNode;	//dialog!
+			elem= target;
+			x= parseInt(target.style.left);
+			y= parseInt(target.style.top);
+		}
+		else if (className=='vsash') {
+			elem= [
+				document.getElementById("results"),
+				target,
+				document.getElementById("defpane")
+				];
+			x= parseInt(target.style.left);
+			y= parseInt(target.style.top);
+		}
+		else {
+			return;
+		}
+		dragging= {
+			drag: className,
+			elem: elem,
+			startX: evt.clientX,
+			startY: evt.clientY,
+			offsetX: x,
+			offsetY: y,
+		};
+		document.onmousemove= onMouseMove;
+		document.body.focus();	//cancel out any text slections
+		document.onselectstart= function(){return false;};	//prevent text selection in IE
+		document.ondragstart= function(){return false;};	//prevent IE from trying to drag an image
+		return false;	//prevent text selection (except IE)
+	}
+/*
+	else if (evt.button==2) {
+		//right button
+		var rng= getRange();
+		if (!rng.collapsed) {
+			//-- with selection
+			var frag= rng.cloneContents();
+			var text= getText_nest(frag);
+			// TODO
+			var elem=document.getElementById("tip");
+			elem.style.left= (evt.clientX)+"px";
+			elem.style.top= (evt.clientY+20)+"px";
+			elem.innerHTML= text;
+			elem.style.display="inline";
+
+			setTimeout("document.getElementById('tip').style.display='none'", 1000);
+		}
+	}
+*/
+}
+
+function onMouseMove(evt) {
+	if (!evt)
+		evt= window.event;
+	var x= dragging.offsetX+evt.clientX-dragging.startX;
+	var y= dragging.offsetY+evt.clientY-dragging.startY;
+	if (dragging.drag=='titlebar' && x>=0 && y>=0) {
+		dragging.elem.style.left= x + 'px';
+		dragging.elem.style.top= y + 'px';
+	}
+	else if (dragging.drag=='vsash' && x>=30) {
+		dragging.elem[0].style.width= (x-5) + 'px';
+		dragging.elem[1].style.left= x + 'px';
+		dragging.elem[2].style.left= (x+5) + 'px';
+	}
+}
+function onMouseUp(evt) {
+	if (dragging) {
+		document.onmousemove= null;
+		document.onselectstart= null;
+		document.ondragstart= null;
+		dragging= null;
 	}
 }
 
@@ -1051,8 +1446,8 @@ function showTip() {
 	var tip= lang_tips[targetId];
 	if (tip) {
 		var elem=document.getElementById("tip");
-		elem.style.left= (evt.clientX)+"px";
-		elem.style.top= (evt.clientY+20)+"px";
+		elem.style.left= (evt.clientX+15)+"px";
+		elem.style.top= (evt.clientY)+"px";
 		elem.innerHTML= tip;
 		elem.style.display="inline";
 	}

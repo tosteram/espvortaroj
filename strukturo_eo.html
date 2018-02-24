@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<!-- 2014-07-04 作成 -->
+<!-- 2014-07-04 -->
 <title>Strukturo de Espvortaroj</title>
 <style type="text/css">
 	h1 {font-size:15pt; border-bottom:2px solid grey; padding-bottom:1px;}
@@ -10,75 +10,84 @@
 	h3 {font-size:12pt; padding-bottom:1px;}
 	.faint {color:grey; font-size:smaller;}
 	.star {color:darkblue; background-color:#e8ffe8;}
+	.dict_n {border:solid 1px grey; padding:0px 2px; margin-left:5px; color:black;}
 </style>
 </head>
 
 <body style="max-width:190mm; margin-left:3mm; line-height:1.3em; font-family:Tahoma, Airal, sans-serif; font-size:12pt; color:#404040;">
 <h1>Strukturo de <i>Espvortaroj</i></h1>
-<div style="text-align:right;">(v1.0 2014-07-16)</div>
+<div style="text-align:right;"><b>v2.0</b> (2014-08-01)</div>
 
 Tiu ĉi dosiero klarigas agordojn en "js/init.js", lingvajn dosierojn, kaj vortaran formaton.<br>
-Ĉiuj dosieroj devas esti skribitaj per <u>la signaro UTF-8</u>.
+Ĉiuj dosieroj devas esti koditaj per <u>la signaro UTF-8</u>.
 
 <h2 id="dict_settings">1. Agordoj de vortaroj</h2>
 Vortaroj uzataj devas esti difinitaj kun la variablo <b>dictionaries</b> en js/init.js. 
-Jen estas la elementoj de <i>dictionaries</i>:<br>
+Jen estas unu elemento de <i>dictionaries</i>:<br>
 <pre>
     <i>NAME_ID</i>: {
         name:"○○○○", edition:"△△△△",
-        dict_js:"□□□.js", text:"xxx",
+        dict_js:"□□□.js", text:"xxx", color:"***",
         dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
         },
 </pre>
+<u>Atributoj de la elemento</u><br>
 <b>NAME_ID</b> : Identigilo por referenci la vortaron.<br>
 <b>name</b> : Montra nomo<br>
 <b>edition</b> : Redaktoro, Versio, Jaro de eldono, ktp.<br>
 <b>dict_js</b> : Dosiernomo de vortaro. (Ref. <a href="#dict_file">3. Vortaraj dosieroj</a> malsupre)<br>
-<b>text</b> : Tipo de vortarteksto: <i>plain</i> aŭ <i>html</i>&nbsp; (Nuntempe, nur <i>plain</i> estas subtenata.)<br>
+<b>text</b> : Tipo de vortarteksto: <i>plain</i> aŭ <i>html</i>&nbsp; (Ĉi tiu atributo ne estas uzata en la programo. Okaze de <i>html</i>, uzu la funkcion <i>makeDef_html</i> por <a href="#dict_funcs"><i>makeDef</i></a>)<br>
+<b>color</b> : Fona koloro. Uzu formojn de CSS:
+[Ekz. "silver" kolornomo, "#rrggbb" RGB en deksesuma sistemo, "rgb(r,g,b)" RGB en dekuma/%]
+(v2.0 aŭ poste. Se nedifinita, <a href="#colors">la defaŭlta koloro</a> estas uzata)<br>
 <b>dict, conv1, conv2, makeEntry, makeDef</b> : Datumoj de vortaro kaj funkcioj. 
 Referencu <a href="#dict_funcs">la difinojn de vortaro</a>. Ĉi tie atribuu <i>null</i> al ĉiuj.<br>
 <br>
-<span class="star">*</span> Vortaroj estos ŝarĝitaj dinamike (nur necesaj vortaroj, kiuj estis elektitaj sur la dialogujo "Elekti vortaron", estos ŝarĝitaj en la memoron).<br>
+<span class="star">*</span> Vortaroj estos ŝarĝitaj dinamike (nur necesaj vortaroj, kiuj estis elektitaj sur la dialogujo "Elekti vortarojn", estos ŝarĝitaj en la memoron).<br>
 <br>
 
-<h2 id="default_dict">2. Komenca vortaro</h2>
-Atribuu "<i>NAME_ID</i>" (menciita supre; duoblaj citiloj necesas) al la variablo <b>defaultDict</b> en js/init.js, por komenci la aplikaĵon kun la vortaro, kiu estos ŝarĝita ĉe startigo.<br>
-Se defaultDict=null, la dialogujo "Elekti vortaron" aperos ĉe startigo.<br>
+<h2 id="default_dict">2. Komenca(j) vortaro(j)</h2>
+Atribuu "<i>NAME_ID</i>" (menciita supre; duoblaj citiloj necesas) al la variablo <b>defaultDicts</b> en js/init.js, por komenci la aplikaĵon kun la vortaro(j), kiu(j) estos ŝarĝita(j) en la momento de startigo.<br>
+<span class="faint">(metu NAME_IDoj en [...]; se pluraj, apartigu ilin per komoj.)</span><br>
+Se defaultDicts=[], la dialogujo "Elekti vortarojn" aperos en la momento de startigo.<br>
 <br>
 
 <h2 id="dict_file">3. Vortaraj dosieroj</h2>
-Metu vortarajn dosierojn en la dosierujon "vortaroj". La dosiernomoj estas atribuitaj al la elemento <i>dict_js</i> menciita en <a href="#dict_settings">1. Agordoj de vortaroj</a>.<br>
+Metu vortarajn dosierojn en la dosierujon "vortaroj". Oni devas atribui dosiernomon al la atributo <i>dict_js</i> menciita en <a href="#dict_settings">1. Agordoj de vortaroj</a>.<br>
 
-En la vortara dosiero, oni difinas vortaraj datumoj kaj funkcioj jenaj.
+En la vortara dosiero, oni difinas vortarajn datumojn kaj funkciojn:
 
-<h3 id="dict_format">= Vortaraj datumoj =</h3>
+<h3 id="dict_format">[ Vortaraj datumoj ]</h3>
 <pre>
 var <i>DICT_DATA</i> = [
-    [...], <span class="faint">(Interna Tabelo por unu kapvorto)</span>
+	[...], <span class="faint">(<i>Interna Tabelo</i> por unu kapvorto)</span>
     ...
     ];
 </pre>
-Tiu ĉi estas la tabelo de vortraj datumoj, kiuj devas esti alfabete-ordigitaj.
+Tiu ĉi estas la tabelo de vortaraj datumoj, kiuj devas esti ordigitaj laŭ alfabeto.
 Uzu unikan nomon por <i>DICT_DATA</i>.
-La tabelo konsistas el Internaj Tabeloj en la sekvanta formo:<br>
-[Serĉato, Kapvorto, Enhavo (, alia datumo, ...)]<br>
+La tabelo konsistas el <i>Internaj Tabeloj</i> en la sekvanta formo:<br>
+[<i>Serĉato</i>, <i>Kapvorto</i>, <i>Enhavo</i> (, alia datumo, ...)]<br>
 La elementoj [0], [1], [2] estas devigaj en tiu ordo.
 <i>Serĉato</i> estas signovico kiu estos serĉita per Kapvorto-serĉado.
 <i>Kapvorto</i> estas uzata por montrado.
 Kiam <i>Serĉato</i> kaj <i>Kapvorto</i> estas egalaj, <i>Kapvorto</i> povas esti "".
 La sekvantaj literoj en <i>Enhavo</i> devas esti transformitaj jene:<br>
-\ (deklivo) → \\<br>
-" (citilo) → \" <br>
-<!--
-&amp; → &amp;amp;<br>
-&lt; → &amp;lt;<br>
-&gt; → &amp;lgt<br>
--->
-<i>Aliajn datumojn</i> oni povas difini por vorta klasigo, rilataj imagoj, ktp., 
+&nbsp; \ (deklivo) → \\<br>
+&nbsp; " (citilo) → \" <br>
+Okaze de HTML-teksto, la literoj sekvantaj devas esti transformitaj:<br>
+&nbsp; &amp; → &amp;amp;<br>
+&nbsp; &lt; → &amp;lt;<br>
+&nbsp; &gt; → &amp;lgt;<br>
+<span class="faint">* linifino estas \n. Sed defaŭlte, ili ne aperos.
+Se vi volas aperigi linifinojn, skribu vian propran funkcion <a href="#dict_funcs">makeDef</a>.
+Alternative, transformu la tekston al HTML-formaton (linifinon al &lt;br&gt;, kaj ankaŭ transformu signojn: &amp; &lt; &gt;), kaj uzu <i>makeDef_html</i></span>.<br>
+<br>
+<i>Aliajn datumojn</i> oni povas difini por klasigo, rilataj imagoj, ktp., 
 kiuj estos montritaj per la funkcio <i>makeDef</i> klarigata en la sekvanta sekcio.<br>
 
 
-<h3 id="dict_funcs">= Funkcioj =</h3>
+<h3 id="dict_funcs">[ Funkcioj ]</h3>
 <pre>
 var <i>FUNCS</i> = {
     conv1: function(schstr) { .... },
@@ -100,20 +109,21 @@ Uzu unikan nomon por <i>FUNCS</i>.<br>
 	<span class="star">*</span> <i>params</i>: la vortara identigilo kaj la indekso al la kapvorto<br>
 	<span class="star">*</span> <i>klass</i>: HTML-klaso ("r": normala kapvorto)<br>
 	Liveras la elementon HTML &lt;div&gt;, en kiun estas metita la montrota enhavo.<br>
-	Notu: Atribuu la argumento <i>params</i> al la atributo "params" de la &lt;div&gt;:<br>
+	Notu: Atribuu la argumenton <i>params</i> al la atributo "params" de la &lt;div&gt;:<br>
 	&nbsp; <code>div.setAttribute("params", params)</code></li>
-	<li><b>makeDef</b> : Montras la enhavo de unu vortarano.<br>
+	<li><b>makeDef</b> : Montras la enhavon de unu vortarano.<br>
 	La argumento estas unu "Interna Tabelo" el la vortaranoj.<br>
 	Liveras la elementon HTML &lt;div&gt;, en kiun estas metita la montrota enhavo.<br>
 	</li>
 </ul>
-NOTO 1: Vi povas uzi la transformaj funkcioj difinitaj en js/regilo.js .
-Specialajn transformojn oni devas skribi per si mem.<br> Jen la funkcioj pretaj:<br>
+[NOTO 1] Vi povas uzi la transformajn funkciojn jam difinitajn en js/regilo.js .
+Por speciala transformo oni devas skribi funkcion per si mem.<br> Jen la funkcioj pretaj:<br>
 	<span class="star">*</span> chapeligu(s)  : Transformas <i>s</i> laŭ X-sistemo.<br>
 	<span class="star">*</span> romajiToHiragana(s) : Transformas latinajn literojn al hiragana.<br>
-	<span class="star">*</span> longToVowel(s) : Transformas signojn de longaj silaboj al vokalaj literoj.<br>
+	<span class="star">*</span> longToVowel(s) : Transformas signojn de japanaj longaj silaboj al vokalaj literoj.<br>
+	<span class="star">*</span> makeDef_html(entry) : Montras enhavon de <i>entry</i> en HTML-teksto.<br>
 <br>
-NOTO 2: Atribuu <i>null</i> al tiuj funkcioj por voki la defaŭltajn funkciojn:<br>
+[NOTO 2] Atribuu <i>null</i> al tiuj funkcioj por voki la defaŭltajn funkciojn:<br>
 <ul>
 	<li>conv1_default : chapeligu(s)</li>
 	<li>conv2_default : chapeligu(s)</li>
@@ -128,11 +138,11 @@ callback("<i>NAME_ID</i>", <i>DICT_DATA</i>, <i>FUNCS</i>);
 <br>
 
 <h2 id="lang">4. Agordoj de lingvo</h2>
-La var <b>lang_file</b> en js/init.js havas la dosiernomon de lingvo montrata.
+La var <b>lang_file</b> en js/init.js havas la dosiernomon de lingvo kiun <i>Espvortaroj</i> uzas.
 La formo de la dosiernomo estas "lang_<i>LL</i>.js", kie <i>LL</i> estas la du-litera nomo difinita de <a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO 639.1</a>.
 Lingvaj dosieroj estas metita en la dosierujo "js".<br>
-Kiam lang_file=null, la lingvo estas elektita aŭtomete; se la rezulta lingvo (la du-litera nomo) troviĝas en var <b>available_langs</b>, tiu lingvo estos uzata; se ne troviĝas, Esperanto estos uzata.
-Kiam vi almetas lingvon, ne forgesu almeti la nomon ankaŭ en <i>available_langs</i><br>
+Kiam lang_file=null, la lingvo estas elektita aŭtomate; se la rezulta lingvo (la du-litera nomo) troviĝas en var <b>available_langs</b>, tiu lingvo estos uzata; se ne troviĝas, Esperanto estos uzata.
+Kiam vi almetas lingvon, ne forgesu almeti la nomon ankaŭ en <i>available_langs</i>.<br>
 
 Vidu la enhavojn de ekzemplaj lingvaj dosieroj (lang_eo.js, lang_en.js, lang_ja.js).<br>
 Jen nur malneta klarigo de ĉefaj variabloj:<br>
@@ -160,26 +170,71 @@ var defaultOpts= {
     <b>entrySearch</b>: "match_prefix",(antaŭkongrua) aŭ, "match_partial"(partkongrua),
                   "match_complete"(tutkongrua)
     <b>entiretext_wordSearch</b>: false, aŭ, true (Vortserĉado en la tuta teksto)
+	
     //display options (Montraj opcioj)
     <b>showAfterSearch</b>: true, aŭ, false (Montri enhavojn post serĉo)
     <b>retain</b>: false, aŭ true (Teni la montritaĵojn)
     <b>usePool</b>: false, aŭ true (Uzi la Akumulejon)
+    <b>colorize</b>: false, aŭ true (Kolorigi laŭ vortaroj)
     <b>howDisplayDefs</b>: "prepend"(almeti supre),	aŭ "append"(almeti malsupre),
                  "showone" (montri nur la elektita)
     <b>maxDefs</b>: 100 (maksimuma nombro de montritaĵoj)
+
+    //others
+    <b>font_family</b>: "Tahoma, Times New Roman, sans-serif" (Tipara familio)
+    <b>font_size</b>: "12pt"  (Tipara grando)
+    <b>list_width</b>:150     (Larĝeco de la maldekstra rubriko [px])
+    <b>sort</b>: "sort_esp" aŭ "sort_none", "sort_local"  (Ordigo)
+    <b>use_cookie</b>: false aŭ true            ((Ne uzata nuntempe))
 };
 </pre>
 
-<hr>
-Vi povas libere elŝuti kaj uzi la softvaron <i>Espvortaroj</i>n senpage se la celoj estas nekomercaj.<br>
-Ni transformos la formatojn de aliaj vortaroj por ebligi ilin uzi kun <i>Espvortaroj</i>, se la sekvantaj kondiĉoj plenumiĝas:<br>
+<h2 id="colors">6. Defaŭltaj koloroj por vortaroj</h2>
+
+Kiam var <a href="#dict_settings">dictionaries</a> ne havas la difinon de atributo
+<i>color</i>: , la sekvantaj koloroj estas uzataj laŭ la ordo de vortaroj.<br>
+Koloroj estas difinitaj en la CSS formoj:
+[Ekz. "silver" kolornomo, "#RRGGBB" RGB en desesuma sistemo, "rgb(R,G,B)" RGB en dekuma sistemo aŭ procentoj]<br>
+<br>
+var bgcolors= [<br>
+&nbsp; 
+	<span class="dict_n" style="background-color:#F5FFB1">1</span>
+	<span class="dict_n" style="background-color:#D8FFB1">2</span>
+	<span class="dict_n" style="background-color:#BAFFB1">3</span>
+	<span class="dict_n" style="background-color:#B1FFC4">4</span>
+	<span class="dict_n" style="background-color:#CDFEEC">5</span>
+	<span class="dict_n" style="background-color:#C1D4FF">6</span>
+	<span class="dict_n" style="background-color:#E6CDFE">7</span>
+	<span class="dict_n" style="background-color:#FFF1E9">8</span>
+	<span class="dict_n" style="background-color:#F8FECD">9</span>
+	<span class="dict_n" style="background-color:#FCE9FF">10</span><br>
+	<br>
+&nbsp; 
+	<span class="dict_n" style="background-color:#E6E6E6">11</span>
+	<span class="dict_n" style="background-color:#E8FABE">12</span>
+	<span class="dict_n" style="background-color:#FAF4DB">13</span>
+	<span class="dict_n" style="background-color:#DAF5EE">14</span>
+	<span class="dict_n" style="background-color:#DFDAF5">15</span>
+	<span class="dict_n" style="background-color:#F6E9F4">16</span>
+	<span class="dict_n" style="background-color:#F3F6E9">17</span>
+	<span class="dict_n" style="background-color:#DDFFE3">18</span>
+	<span class="dict_n" style="background-color:#FAFFDD">19</span>
+	<span class="dict_n" style="background-color:#FFEDDD">20</span><br>
+];<br>
+<br>
+
+<h2 id="about">Pri <i>Espvortaroj</i></h2>
+* Vi povas libere elŝuti kaj uzi la softvaron <i>Espvortarojn</i> senpage se la celo estas nekomerca (por komercaj uzadoj, kontaktu nin).<br>
+* Observu la licencon por ĉiu vortaro; vortaroj povas esti pagendaj.<br>
+* Ni transformos la formatojn de aliaj vortaroj por ebligi ilin uzi kun <i>Espvortaroj</i>, se la sekvantaj kondiĉoj plenumiĝas:<br>
 &nbsp; 1. La vortaro devas esti publika kaj senpaga.<br>
 &nbsp; 2. Ne troviĝas neniuj problemoj kun aŭtorrajto, licenco, ktp.<br>
 &nbsp; 3. La vortaro devas rilati al Esperanto.<br>
 (Ni donos konsilojn eĉ en aliaj kondiĉoj se ni trovis neceson.)<br>
-Kontaktu <img src="sistem_img/Email-address.gif">.<br>
-La retpaĝo: <a href="http://esperanto.mond.jp/eo/index.html">esperanto.mond.jp (Verda Monteto)</a><br>
-(2014-07-16)<br>
+* <a href="history_eo.html">Ŝanĝo-historio de Espvortaroj</a><br>
+* Kontaktu <img src="sistem_img/Email-address.gif">.<br>
+* La retpaĝo: <a href="http://esperanto.mond.jp/eo/index.html#espvortaroj">esperanto.mond.jp  - Verda Monteto</a><br>
+(2014-08-01)<br>
 </body>
 </html>
 

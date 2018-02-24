@@ -1,4 +1,4 @@
-// 2014-07-05
+// 2014-07-05; 07-30
 // lingvo: la japana
 
 // id
@@ -6,7 +6,7 @@ var lang_href_help= "help_ja.html";	//href
 var lang_button= {
 	btn_search:"検索",
 	btn_delete:"全消去",
-	btn_select:"すべて収納",
+	btn_toPool:"すべて収納",
 	btn_emptyPool:"空にする",
 };
 var lang_lbl= {
@@ -17,6 +17,11 @@ var lang_lbl= {
 	lbl_entries: "見出し語",
 	lbl_entiretext: "全文",
 
+	title_opts:"オプション",
+	tab1:"検索",
+	tab2:"表示",
+	tab3:"その他",
+
 	schopts_entry:	"見出し語",
 	schopts_prefix: "入力文字列で始まる",
 	schopts_contain: "入力文字列を含む",
@@ -24,16 +29,22 @@ var lang_lbl= {
 	schopts_entiretext: "全文",
 	schopts_word2: "単語(アルファベット)検索",
 
-	lbl_results: "★検索結果",
+	lbl_results: "見出し語のリスト",
 
 	lbl_showdefs: "検索後内容表示",
 	lbl_retain: "内容保持",
 	lbl_usePool: "収納箱を使う",
+	lbl_colorize: "辞書別色分け",
 	lbl_sel_entry: "見出し語選択時",
 	lbl_prepend: "上に追記",
 	lbl_append: "下に追記",
 	lbl_showone: "選択語のみ表示",
 	lbl_maxdefs: "最大表示個数",
+
+	lbl_sort:"複数辞書見出し語検索時のソート",
+	lbl_sortnone:"ソートしない",
+	lbl_sortesp:"エスペラント・アルファベット順",
+	lbl_sortlocal:"地域の言語による",
 
 	lbl_pool:"収納箱",
 
@@ -46,7 +57,8 @@ var lang_str= {
 	dict_load: "辞書の読み込み/解放↓",
 	ok:"ＯＫ",
 	cancel:"キャンセル",
-	entries:"見出し語",
+	hit1:" 語一致",
+	hit2:" 語一致",
 	msg_selectDict:"検索する辞書を選択してください",
 	msg_loadDict:"検索用の辞書を読み込んでください。",
 };

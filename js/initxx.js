@@ -18,17 +18,18 @@ var lang_file= null;
 var defaultDicts= [];	//dictionary IDs
 
 var dictionaries= {
-	kaji: {
+/*	kaji: {
 		name:"(梶)和エス辞典", edition:"梶弘和編 1957年",
 		dict_js:"kajiwaes.js", text:"plain",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
+*/
 	pejv: {
 		name:"実用エスペラント小辞典(エス和)", edition:"広高正昭編 V1.80 2010-10-30",
 		dict_js:"pejv.js", text:"plain",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
-	pevl: {
+/*	pevl: {
 		name:"電子版エスペラント日本語単語集", edition:"広高正昭 他編, 1997.01.06",
 		dict_js:"pevl.js", text:"plain",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
@@ -38,6 +39,7 @@ var dictionaries= {
 		dict_js:"bestplant.js", text:"plain",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
+*/
 	espdic: {
 		name:"Esperanto-English (Denisowski)", edition:"Paul Denisowski, 19 Dec. 2013",
 		dict_js:"espdic.js", text:"plain",
@@ -49,12 +51,12 @@ var dictionaries= {
 		dict_js:"butler.js", text:"html",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
-*/
 	engesp1906: {
 		name:"English-Esperanto (1906)", edition:"O'Connor and Hayes, 1906",
 		dict_js:"engesp1906.js", text:"plain",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
+*/
 };
 
 /////////////////////////////
