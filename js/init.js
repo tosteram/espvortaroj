@@ -24,7 +24,7 @@ var dictionaries= {
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},
 	pejv: {
-		name:"実用エスペラント小辞典(エス和)", edition:"広高正昭編 V1.80 2010-10-30",
+		name:"実用エスペラント小辞典(エス和)", edition:"広高正昭編 V1.81 2017-01-30",
 		dict_js:"pejv.js", text:"plain",
 		dict:null, conv1:null, conv2:null, makeEntry:null, makeDef:null
 		},

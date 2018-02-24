@@ -1,11 +1,11 @@
 legumin.txt
 -------------------------------------------------------------------------
-   Praktika Esperanto-Japana Vortareto.  Ver.1.80 (provizora 2a eldono)
+   Praktika Esperanto-Japana Vortareto.  Ver.1.81 (provizora 2a eldono)
 -------------------------------------------------------------------------
 
    Tiu c^i vortareto estas la posteulo de "Elektronika Baza Vortaro 
 Esperanto-Japana", kiu aperis en la jaro 1996 kun c^. 4700 kapvortoj.
-G^i nun enhavas c^. 42 000 kapvortojn.   Mi planas, ke g^i kresku g^is 
+G^i nun enhavas c^. 44 100 kapvortojn.   Mi planas, ke g^i kresku g^is 
 la amplekso de c^. 50 000 kapvortoj.   Jen tio c^i estas la sepa pas^o 
 al la dua eldono oficiala.
 
@@ -25,7 +25,7 @@ al la dua eldono oficiala.
 
    Notu, ke mi uzas "Shift-JIS"-kodaron por la japanlingva parto.
 
-   2010.10.30
+   2017.01.30
 
                            HIROTAKA Masaaki  <hirotk-m(c^e)nifty.com>
 
